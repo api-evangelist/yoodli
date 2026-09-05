@@ -1,0 +1,159 @@
+generated: '2026-09-04'
+method: derived
+source: openapi/yoodli-api-openapi.yml
+format: bespoke-error-envelope
+rfc9457: false
+envelope:
+  schema: components.schemas.ErrorResponse
+  fields:
+  - name: error
+    required: true
+    description: Error message. For developers, not for end users, and not translated.
+  - name: code
+    required: false
+    description: Error code identifying a known mode of failure; the frontend is expected to translate it into a
+      user-facing message.
+  media_type: application/json
+status_summary:
+  '400': Invalid request / body / query parameters
+  '403': Permission denied, or resource not visible to the caller
+  '404': Resource not found or no access
+  '409': Conflict — seat allocation below current usage
+  '207': 'Multi-Status: per-item results on bulk operations (not an error, but where per-item failures surface)'
+problem_count: 31
+problems:
+- status: 400
+  title: Invalid query parameters or the User Group is managed by SCIM.
+  source_operation: openapi/yoodli-api-openapi.yml#DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  media_type: application/json
+- status: 400
+  title: Invalid request.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/orgs/{orgId}/invites
+  media_type: application/json
+- status: 400
+  title: Invalid request.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/orgs/{orgId}/users
+  media_type: application/json
+- status: 400
+  title: Invalid query parameters.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/speeches/{speechId}/feedback
+  media_type: application/json
+- status: 400
+  title: Invalid request body or seat allocation exceeds Multi Org limit.
+  source_operation: openapi/yoodli-api-openapi.yml#PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  media_type: application/json
+- status: 400
+  title: Invalid request body.
+  source_operation: openapi/yoodli-api-openapi.yml#PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  media_type: application/json
+- status: 400
+  title: Invalid request.
+  source_operation: openapi/yoodli-api-openapi.yml#PATCH /v3/orgs/{orgId}/members/expiration
+  media_type: application/json
+- status: 400
+  title: Invalid request body.
+  source_operation: openapi/yoodli-api-openapi.yml#POST /v3/orgs/{orgId}/hubs
+  media_type: application/json
+- status: 400
+  title: Invalid request body.
+  source_operation: openapi/yoodli-api-openapi.yml#POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+  media_type: application/json
+- status: 400
+  title: Invalid request.
+  source_operation: openapi/yoodli-api-openapi.yml#POST /v3/orgs/{orgId}/users
+  media_type: application/json
+- status: 400
+  title: Invalid request.
+  source_operation: openapi/yoodli-api-openapi.yml#POST /v3/orgs/{orgId}/users/remove
+  media_type: application/json
+- status: 403
+  title: The caller does not have permission to delete the User Group or attempting to delete the default User Group.
+  source_operation: openapi/yoodli-api-openapi.yml#DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  media_type: application/json
+- status: 403
+  title: Permission denied. The caller is not an administrator of this Multi Org.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/enterprises/{enterpriseId}
+  media_type: application/json
+- status: 403
+  title: Not authorized to download this recording's feedback.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/speeches/{speechId}/feedback
+  media_type: application/json
+- status: 403
+  title: Permission denied or Organization does not belong to this Multi Org.
+  source_operation: openapi/yoodli-api-openapi.yml#PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  media_type: application/json
+- status: 403
+  title: The caller does not have permission to update the User Group.
+  source_operation: openapi/yoodli-api-openapi.yml#PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  media_type: application/json
+- status: 403
+  title: Access denied or the resource not found.
+  source_operation: openapi/yoodli-api-openapi.yml#PATCH /v3/orgs/{orgId}/members/expiration
+  media_type: application/json
+- status: 403
+  title: The Organization's User Group quota has been exceeded.
+  source_operation: openapi/yoodli-api-openapi.yml#POST /v3/orgs/{orgId}/hubs
+  media_type: application/json
+- status: 403
+  title: Access denied or the resource not found.
+  source_operation: openapi/yoodli-api-openapi.yml#POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+  media_type: application/json
+- status: 403
+  title: Access denied or the resource not found.
+  source_operation: openapi/yoodli-api-openapi.yml#POST /v3/orgs/{orgId}/users
+  media_type: application/json
+- status: 403
+  title: Access denied or the resource not found.
+  source_operation: openapi/yoodli-api-openapi.yml#POST /v3/orgs/{orgId}/users/remove
+  media_type: application/json
+- status: 404
+  title: The Organization or User Group not found or no access.
+  source_operation: openapi/yoodli-api-openapi.yml#DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  media_type: application/json
+- status: 404
+  title: Multi Org not found.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/enterprises/{enterpriseId}
+  media_type: application/json
+- status: 404
+  title: The Organization not found or no access.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/orgs/{orgId}
+  media_type: application/json
+- status: 404
+  title: The resource not found or no access to the resource.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/orgs/{orgId}/invites
+  media_type: application/json
+- status: 404
+  title: The resource not found or no access to the resource.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/orgs/{orgId}/users
+  media_type: application/json
+- status: 404
+  title: Recording not found, or not accessible to the caller.
+  source_operation: openapi/yoodli-api-openapi.yml#GET /v3/speeches/{speechId}/feedback
+  media_type: application/json
+- status: 404
+  title: Multi Org or Organization not found.
+  source_operation: openapi/yoodli-api-openapi.yml#PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  media_type: application/json
+- status: 404
+  title: The Organization or User Group not found or no access.
+  source_operation: openapi/yoodli-api-openapi.yml#PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  media_type: application/json
+- status: 404
+  title: The Organization not found or no access to the Organization.
+  source_operation: openapi/yoodli-api-openapi.yml#POST /v3/orgs/{orgId}/hubs
+  media_type: application/json
+- status: 409
+  title: Seat allocation is less than current usage.
+  source_operation: openapi/yoodli-api-openapi.yml#PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  media_type: application/json
+code_registry:
+  published: false
+  note: Yoodli documents an optional "code" field but publishes no registry of its values, and none of the 4xx responses
+    in the spec enumerate codes or carry examples. An agent cannot branch on a known error code set; it can only
+    branch on HTTP status and read the untranslated "error" string. Yoodli also does not document a 429 response
+    body shape in the spec even though the rate-limit page documents 429 — no operation declares a 429 response
+    at all.
+not_declared_in_spec:
+- 429 Too Many Requests (documented on the rate-limit page, absent from every operation)
+- 401 Unauthorized (no operation declares one despite BearerAuth on all 13)
+- 5xx (no server-error response is declared on any operation)

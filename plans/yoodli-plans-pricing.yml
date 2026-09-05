@@ -1,0 +1,46 @@
+generated: '2026-09-04'
+method: searched
+source: https://yoodli.ai/pricing
+currency: USD
+plan_count: 4
+plans:
+- name: Starter
+  price: 0
+  price_display: Free
+  currency: USD
+  billing_period: n/a
+  included: 5 lifetime sessions
+  overage: null
+  contact_sales: false
+- name: Pro
+  price: 8
+  price_display: $8/month billed annually
+  currency: USD
+  billing_period: monthly or annual
+  included: Up to 10 roleplays per week, live AI roleplays, feedback on uploaded recordings
+  overage: null
+  contact_sales: false
+- name: Advanced
+  price: 20
+  price_display: $20/month billed annually
+  currency: USD
+  billing_period: monthly or annual
+  included: Unlimited roleplays, data excluded from AI training, reimbursable as a professional-development benefit
+  overage: null
+  contact_sales: false
+- name: Team & Enterprise
+  price: null
+  price_display: Custom — contact sales
+  currency: USD
+  billing_period: custom
+  included: Custom AI roleplay scenarios, team and manager dashboards, rubric-based scoring, SSO, SCIM provisioning,
+    LMS and HRIS integrations, advanced admin controls
+  overage: null
+  contact_sales: true
+  contact_url: https://yoodli.ai/talk-to-sales
+api_access:
+  note: The public REST API is an administrative surface tied to Organization / Multi Org administration, which
+    is a Team & Enterprise capability — API keys are created from Org Settings by an Organization Administrator/Owner
+    or a Multi Org Administrator. Yoodli publishes no separate API price, no metered API pricing and no per-call
+    rate on the pricing page.
+annual_discount: Up to 40% off individual plans when billed annually

@@ -1,0 +1,147 @@
+generated: '2026-09-04'
+method: derived
+source:
+- mcp/yoodli-mcp.yml (live tools/list, 5 tools)
+- openapi/yoodli-api-openapi.yml (13 operations)
+surfaces:
+  openapi:
+    file: openapi/yoodli-api-openapi.yml
+    operations: 13
+    gated: false
+    note: Harvested from the ReadMe reference page ssr-props; describes https://app.yoodli.ai/api.
+  graphql:
+    endpoint: null
+    note: Yoodli publishes no GraphQL surface.
+  mcp:
+    url: https://developers.yoodli.ai/mcp
+    gated: false
+    note: tools/list answered anonymously with HTTP 200 and 5 tools.
+binding_model: This is a spec-navigation MCP server, not a resource-per-tool server. None of its 5 tools maps 1:1
+  to a Yoodli operation; four of them take the whole OpenAPI document as their subject and one (execute-request)
+  is a generic HAR proxy that can reach ANY of the 13 operations. The crosswalk below therefore records fan-out,
+  not one-to-one binding, and every row is honest about that.
+crosswalk:
+- tool: list-endpoints
+  category: discovery
+  rest:
+  - GET /v3/enterprises/{enterpriseId}
+  - PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  - POST /v3/orgs/{orgId}/hubs
+  - DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  - PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  - GET /v3/orgs/{orgId}
+  - POST /v3/orgs/{orgId}/users
+  - GET /v3/orgs/{orgId}/users
+  - POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+  - POST /v3/orgs/{orgId}/users/remove
+  - GET /v3/orgs/{orgId}/invites
+  - PATCH /v3/orgs/{orgId}/members/expiration
+  - GET /v3/speeches/{speechId}/feedback
+  binding: document-wide
+  confidence: high
+  note: Enumerates all 13 published operations from the OpenAPI. No inputs.
+- tool: get-endpoint
+  category: discovery
+  rest:
+  - GET /v3/enterprises/{enterpriseId}
+  - PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  - POST /v3/orgs/{orgId}/hubs
+  - DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  - PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  - GET /v3/orgs/{orgId}
+  - POST /v3/orgs/{orgId}/users
+  - GET /v3/orgs/{orgId}/users
+  - POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+  - POST /v3/orgs/{orgId}/users/remove
+  - GET /v3/orgs/{orgId}/invites
+  - PATCH /v3/orgs/{orgId}/members/expiration
+  - GET /v3/speeches/{speechId}/feedback
+  binding: document-wide-by-selector
+  confidence: high
+  note: Takes path + method and returns that operation, its security scheme and servers. Reaches any of the 13.
+- tool: search-endpoints
+  category: discovery
+  rest:
+  - GET /v3/enterprises/{enterpriseId}
+  - PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  - POST /v3/orgs/{orgId}/hubs
+  - DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  - PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  - GET /v3/orgs/{orgId}
+  - POST /v3/orgs/{orgId}/users
+  - GET /v3/orgs/{orgId}/users
+  - POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+  - POST /v3/orgs/{orgId}/users/remove
+  - GET /v3/orgs/{orgId}/invites
+  - PATCH /v3/orgs/{orgId}/members/expiration
+  - GET /v3/speeches/{speechId}/feedback
+  binding: document-wide-search
+  confidence: high
+  note: Takes a pattern and searches paths, operations and parameters.
+- tool: execute-request
+  category: execution
+  rest:
+  - GET /v3/enterprises/{enterpriseId}
+  - PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  - POST /v3/orgs/{orgId}/hubs
+  - DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  - PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  - GET /v3/orgs/{orgId}
+  - POST /v3/orgs/{orgId}/users
+  - GET /v3/orgs/{orgId}/users
+  - POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+  - POST /v3/orgs/{orgId}/users/remove
+  - GET /v3/orgs/{orgId}/invites
+  - PATCH /v3/orgs/{orgId}/members/expiration
+  - GET /v3/speeches/{speechId}/feedback
+  binding: generic-proxy
+  confidence: medium
+  note: 'Executes an arbitrary HAR request object. It can invoke every one of the 13 operations, including the 7
+    mutating ones, but the tool has NO per-operation schema and NO Yoodli auth of its own — the caller assembles
+    the whole request and supplies the Authorization: Bearer key. An agent gets no typed input contract and no guardrail
+    from this tool; the real input contract stays in the OpenAPI.'
+- tool: get-server-variables
+  category: discovery
+  rest: []
+  binding: document-metadata
+  confidence: high
+  note: Returns the servers[] variables of the spec (Yoodli declares none — both servers are literal URLs).
+mcp_only: []
+rest_only:
+- capability: Organization user management
+  operations:
+  - POST /v3/orgs/{orgId}/users
+  - GET /v3/orgs/{orgId}/users
+  - POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+  - POST /v3/orgs/{orgId}/users/remove
+  - GET /v3/orgs/{orgId}/invites
+  - PATCH /v3/orgs/{orgId}/members/expiration
+  reason: No dedicated MCP tool; reachable only through the generic execute-request proxy.
+- capability: User Group management
+  operations:
+  - POST /v3/orgs/{orgId}/hubs
+  - DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  - PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  - GET /v3/orgs/{orgId}
+  reason: No dedicated MCP tool; reachable only through the generic execute-request proxy.
+- capability: Multi Org management
+  operations:
+  - GET /v3/enterprises/{enterpriseId}
+  - PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  reason: No dedicated MCP tool; reachable only through the generic execute-request proxy.
+- capability: Speech feedback
+  operations:
+  - GET /v3/speeches/{speechId}/feedback
+  reason: No dedicated MCP tool; reachable only through the generic execute-request proxy.
+coverage:
+  tools_named: 5
+  tools_bound_to_a_named_operation: 0
+  tools_document_wide: 5
+  mcp_only: 0
+  rest_operations_total: 13
+  rest_operations_with_a_dedicated_tool: 0
+  rest_operations_reachable_via_execute_request: 13
+finding: Yoodli's MCP presence is real and callable but it is a documentation server, not an agent surface over
+  the product. An agent connecting to https://developers.yoodli.ai/mcp can read the Yoodli API spec and fire raw
+  HTTP through a proxy tool; it cannot ask for "the members of this org" as a typed tool call. The 13 operations
+  are reachable but none is named, so the gap between the two surfaces is the whole product.

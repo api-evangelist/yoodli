@@ -1,23 +1,154 @@
 aid: yoodli
 name: Yoodli
-description: 'Yoodli is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  Yoodli is a Seattle-based AI communication coaching company, founded in 2021 by former Google
+  engineers and spun out of the Allen Institute for AI incubator. Its platform runs AI roleplays
+  and speech analysis so sales, leadership, L&D and customer-facing teams can rehearse high-stakes
+  conversations — pitches, interviews, performance reviews, discovery calls — and get private,
+  rubric-scored feedback on filler words, pacing, and content. Yoodli publishes a REST API
+  (OpenAPI 3.1.0, base https://app.yoodli.ai/api) for administrative programmatic access: managing
+  Organization members, User Groups (hubs), invites and membership expirations, Multi Org seat
+  allocation, and downloading a recording's rubric goal scores, coaching feedback, reviewer
+  comments and transcript. It also ships a Web Embed API (iframe + postMessage) for embedding
+  Yoodli activities in a host application, and a remote MCP server over its ReadMe developer portal.
 url: https://raw.githubusercontent.com/api-evangelist/yoodli/refs/heads/main/apis.yml
+image: https://files.readme.io/00bff5691627b960ef3c81cd866921c2c7e950e9f964ec08eb36d59b5e1d307a-yoodli_logo_purplebg_16_9.svg
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-09-04'
 modified: '2026-09-04'
 tags:
-- Company
-apis: []
+- Artificial Intelligence
+- Communication
+- Coaching
+- Learning and Development
+- Sales Enablement
+- Speech Analysis
+- Human Resources
+- Enterprise Software
+- SaaS
+- Identity Management
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+apis:
+- aid: yoodli:yoodli-api
+  name: Yoodli API
+  description: >-
+    Yoodli's public REST API (OpenAPI 3.1.0, 13 operations) for administrative programmatic access
+    to the platform — listing, inviting and removing Organization members, creating, updating and
+    deleting User Groups, reading Organization and Multi Org details, adjusting Multi Org seat
+    allocation, setting membership expiration dates, and downloading a recording's feedback
+    (rubric goal scores, coaching feedback, reviewer comments, transcript). Bearer API-key auth;
+    three published rate-limit tiers.
+  humanURL: https://developers.yoodli.ai/docs/introduction
+  baseURL: https://app.yoodli.ai/api
+  image: https://files.readme.io/00bff5691627b960ef3c81cd866921c2c7e950e9f964ec08eb36d59b5e1d307a-yoodli_logo_purplebg_16_9.svg
+  tags:
+  - Organization User Management
+  - User Group Management
+  - Multi Org Management
+  - Speech
+  properties:
+  - type: OpenAPI
+    url: openapi/yoodli-api-openapi.yml
+  - type: Documentation
+    url: https://developers.yoodli.ai/docs/introduction
+  - type: APIReference
+    url: https://developers.yoodli.ai/reference/get_v3-orgs-orgid-users
+  - type: GettingStarted
+    url: https://developers.yoodli.ai/docs/quickstart
+  - type: Overlay
+    url: overlays/yoodli-api-overlay.yaml
 common:
 - type: Website
-  url: https://forgeglobal.com/yoodli_stock/
+  url: https://yoodli.ai/
+- type: DeveloperPortal
+  url: https://developers.yoodli.ai/
+- type: Documentation
+  url: https://developers.yoodli.ai/docs/introduction
+- type: APIReference
+  url: https://developers.yoodli.ai/reference/get_v3-orgs-orgid-users
+- type: GettingStarted
+  url: https://developers.yoodli.ai/docs/quickstart
+- type: Authentication
+  url: authentication/yoodli-authentication.yml
+- type: Support
+  url: https://support.yoodli.ai/
+- type: Blog
+  url: https://yoodli.ai/blog
+- type: GitHubOrganization
+  url: https://github.com/Yoodli
+- type: Pricing
+  url: https://yoodli.ai/pricing
+- type: SignUp
+  url: https://app.yoodli.ai/signup
+- type: Login
+  url: https://app.yoodli.ai/signin
+- type: TermsOfService
+  url: https://yoodli.ai/tos
+- type: PrivacyPolicy
+  url: https://yoodli.ai/privacy
+- type: StatusPage
+  url: https://yoodli.statuspage.io/
+- type: TrustCenter
+  url: https://trust.yoodli.ai/
+- type: Compliance
+  url: https://trust.yoodli.ai/
+- type: ChangeLog
+  url: https://developers.yoodli.ai/changelog
+- type: MCPServer
+  url: mcp/yoodli-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/yoodli-tool-crosswalk.yml
+- type: LLMsTxt
+  url: llms/yoodli-llms.txt
+- type: Plans
+  url: plans/yoodli-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/yoodli-rate-limits.yml
+- type: Conventions
+  url: conventions/yoodli-conventions.yml
+- type: ErrorCatalog
+  url: errors/yoodli-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/yoodli-lifecycle.yml
+- type: Conformance
+  url: conformance/yoodli-conformance.yml
+- type: DataModel
+  url: data-model/yoodli-data-model.yml
+- type: Packages
+  url: packages/yoodli-packages.yml
+- type: Components
+  url: components/yoodli-components.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: DomainSecurity
+  url: security/yoodli-domain-security.yml
+- type: ChangeLog
+  url: changelog/yoodli-changelog.yml
+position: Producing
+x-enrichment:
+  date: '2026-09-04'
+  status: enriched
+  artifacts_added: 26
+  pass: local-v3
+x-coverage:
+  state: covered
+  reason: n/a
+  detail: >-
+    Yoodli publishes a real developer portal, a parsing OpenAPI 3.1.0 with 13 operations, an llms.txt, a
+    dated changelog and a live anonymous MCP server; all were harvested. The one wall hit was the trust
+    center at trust.yoodli.ai, a client-rendered Vanta report whose certifications had to be read from
+    Yoodli's own privacy policy instead.
+  evidence:
+    - url: https://developers.yoodli.ai/llms.txt
+      status: 200
+    - url: https://developers.yoodli.ai/mcp
+      status: 200
+    - url: https://trust.yoodli.ai/
+      status: 200
+  checked: '2026-09-04'

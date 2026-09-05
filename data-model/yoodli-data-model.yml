@@ -1,0 +1,130 @@
+generated: '2026-09-04'
+method: derived
+source: openapi/yoodli-api-openapi.yml
+entities:
+- name: Enterprise
+  label: Multi Org
+  id_field: enterpriseId
+  id_shape: opaque string
+  description: A parent container holding multiple Organizations and a shared seat pool.
+  operations:
+  - GET /v3/enterprises/{enterpriseId}
+  - PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+- name: Org
+  label: Organization
+  id_field: orgId
+  id_shape: opaque string
+  description: A customer tenant. Owns User Groups, members, invites and seat allocation.
+  operations:
+  - GET /v3/orgs/{orgId}
+- name: Hub
+  label: User Group
+  id_field: hubId
+  id_shape: opaque string; the literal "default" names the undeletable fallback group
+  description: 'A group inside an Organization. Naming note: the API calls it a hub, the application calls it a
+    User Group — Yoodli documents this on its Terminology page.'
+  operations:
+  - POST /v3/orgs/{orgId}/hubs
+  - PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  - DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  - POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+- name: Member
+  label: Organization member
+  id_field: user_id
+  natural_key: email
+  id_shape: 20-char opaque string (example aBcD2345eFgH6789iJkm)
+  description: A user who belongs to an Organization; carries role, effective_role and date_last_activity.
+  operations:
+  - GET /v3/orgs/{orgId}/users
+  - POST /v3/orgs/{orgId}/users
+  - POST /v3/orgs/{orgId}/users/remove
+  - PATCH /v3/orgs/{orgId}/members/expiration
+- name: Invite
+  label: Outstanding invite
+  natural_key: email
+  description: A pending Organization or User Group invitation, removed by the same remove operations that remove
+    members.
+  operations:
+  - GET /v3/orgs/{orgId}/invites
+- name: Speech
+  label: Recording
+  id_field: speechId
+  id_shape: opaque string
+  description: A recorded session. Its feedback export carries goal/rubric scores, coaching feedback, reviewer comments
+    and the transcript.
+  operations:
+  - GET /v3/speeches/{speechId}/feedback
+relationships:
+- from: Enterprise
+  to: Org
+  kind: has_many
+  via: orgs (member Organizations in GetEnterpriseResponse)
+- from: Org
+  to: Enterprise
+  kind: belongs_to
+  via: enterpriseId path parameter on the Multi Org operations
+- from: Org
+  to: Hub
+  kind: has_many
+  via: hubs (HubResponseItem[] in OrgResponse)
+- from: Hub
+  to: Org
+  kind: belongs_to
+  via: orgId path parameter
+- from: Org
+  to: Member
+  kind: has_many
+  via: users (OrgMemberListResponse)
+- from: Member
+  to: Hub
+  kind: has_many
+  via: hubs (opt-in via the field=hubs query parameter)
+- from: Hub
+  to: Member
+  kind: has_many
+  via: User Group membership; removing the last membership falls back to the default User Group
+- from: Org
+  to: Invite
+  kind: has_many
+  via: invites (OrgInviteListResponse), optionally scoped by hub_id
+- from: Member
+  to: Speech
+  kind: has_many
+  via: implied — speechId is addressed directly and is not enumerable through the public API
+enumerations:
+- name: RTOrgRole
+  values:
+  - org_owner
+  - org_admin
+- name: RTEffectiveRole
+  values:
+  - org_owner
+  - org_admin
+  - space_admin
+  - hub_admin
+  - hub_member
+- name: RTFeedbackExportSection
+  values:
+  - goals
+  - coaching_feedback
+  - user_comments
+  - transcript
+- name: RTHubRole
+  values:
+  - hub_admin
+  - hub_member
+schema_count: 27
+schema_reuse:
+  AddOrgUsersRequest:
+  - RTHubRole
+  - RTOrgRole
+  OrgMemberListResponse:
+  - RTEffectiveRole
+  - RTOrgRole
+  OrgInviteListResponse:
+  - RTOrgRole
+gaps:
+- No operation exists to list or search Speeches — a caller must already hold a speechId.
+- No Organization-creation or Organization-deletion operation is published; tenants are provisioned out of band.
+- The published spec declares no operationIds on any of its 13 operations, so there is no stable machine handle
+  for an operation.

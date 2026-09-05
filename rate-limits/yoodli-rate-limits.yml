@@ -1,0 +1,54 @@
+generated: '2026-09-04'
+method: searched
+source: https://developers.yoodli.ai/docs/rate-limit
+docs: https://developers.yoodli.ai/docs/rate-limit
+limit_count: 3
+model: 'Endpoints are assigned to one of three named rate-limit categories. Each category has its own independent
+  limit; the category for every operation is stated in its API-reference description ("Rate limit category: Fast
+  API").'
+rate_limits:
+- name: Fast API
+  scope: per-endpoint-category
+  window: 1 minute
+  limit: 100
+  unit: calls
+  burst: null
+  operations:
+  - GET /v3/orgs/{orgId}/users
+  - GET /v3/orgs/{orgId}/invites
+  - GET /v3/orgs/{orgId}
+  - GET /v3/enterprises/{enterpriseId}
+  - GET /v3/speeches/{speechId}/feedback
+- name: Medium API
+  scope: per-endpoint-category
+  window: 1 minute
+  limit: 20
+  unit: calls
+  burst: null
+  operations:
+  - POST /v3/orgs/{orgId}/users
+  - POST /v3/orgs/{orgId}/users/remove
+  - POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+  - PATCH /v3/orgs/{orgId}/members/expiration
+  - PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  - DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  - PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+- name: Slow API
+  scope: per-endpoint-category
+  window: 1 minute
+  limit: 5
+  unit: calls
+  burst: null
+  operations:
+  - POST /v3/orgs/{orgId}/hubs
+exhaustion:
+  status: 429
+  body: 429 Too Many Requests
+  guidance: Yoodli documents retry with exponential backoff on 429.
+response_headers:
+  documented: false
+  note: The rate-limit page documents the numeric limits and the 429 but names NO response headers. No X-RateLimit-*,
+    RateLimit-* (RFC 9331) or Retry-After header is documented, and the OpenAPI declares no rate-limit response
+    headers either. An agent therefore cannot read its remaining budget at runtime — it can only count its own calls
+    against the published tier and back off after a 429. This is the single biggest runtime-signal gap in the API.
+stability_note: Yoodli states thresholds may be adjusted in future with advance notice.

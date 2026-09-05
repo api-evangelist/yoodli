@@ -1,0 +1,30 @@
+generated: '2026-09-04'
+method: generated
+source: openapi/yoodli-api-openapi.yml + the Yoodli developer portal guides
+note: Grounded in method + path, because the published Yoodli OpenAPI declares no operationId on any of its 13 operations.
+  Every path, parameter, status code, batch limit and enum value cited in these skills is verbatim from openapi/_original/yoodli-api-openapi-original.json
+  or a named docs page.
+skills:
+- file: yoodli-onboard-org-cohort.md
+  name: Onboard a cohort into a Yoodli Organization and User Group
+  api: openapi/yoodli-api-openapi.yml
+  operations:
+  - POST /v3/orgs/{orgId}/hubs
+  - POST /v3/orgs/{orgId}/users
+  - GET /v3/orgs/{orgId}
+  - GET /v3/orgs/{orgId}/invites
+  - PATCH /v3/orgs/{orgId}/members/expiration
+- file: yoodli-deprovision-members.md
+  name: Deprovision Yoodli members and User Groups safely
+  api: openapi/yoodli-api-openapi.yml
+  operations:
+  - POST /v3/orgs/{orgId}/users/remove
+  - POST /v3/orgs/{orgId}/hubs/{hubId}/users/remove
+  - DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  - PATCH /v3/orgs/{orgId}/members/expiration
+  - GET /v3/orgs/{orgId}
+- file: yoodli-export-speech-feedback.md
+  name: Export Yoodli coaching feedback for a session
+  api: openapi/yoodli-api-openapi.yml
+  operations:
+  - GET /v3/speeches/{speechId}/feedback

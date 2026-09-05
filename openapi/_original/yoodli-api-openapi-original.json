@@ -1,0 +1,2549 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Yoodli API spec",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://app.yoodli.ai/api",
+      "description": "Official API server"
+    },
+    {
+      "url": "http://localhost:3001/api",
+      "description": "(Yoodli internal use only) local server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Organization User Management",
+      "x-tag-expanded": false,
+      "description": "Operations on members of Organizations and their User Groups."
+    },
+    {
+      "name": "User Group Management",
+      "x-tag-expanded": false,
+      "description": "Operations on User Groups."
+    },
+    {
+      "name": "Multi Org Management",
+      "x-tag-expanded": false,
+      "description": "Operations on Multi Org feature."
+    },
+    {
+      "name": "Speech",
+      "x-tag-expanded": false,
+      "description": "Operations on recordings and their feedback exports."
+    }
+  ],
+  "paths": {
+    "/v3/enterprises/{enterpriseId}": {
+      "get": {
+        "summary": "Get Multi Org details",
+        "tags": [
+          "Multi Org Management"
+        ],
+        "description": "Retrieves detailed information about a Multi Org including administrators,\nmember Organizations, and seat pool usage statistics.\n\nRate limit category: Fast API",
+        "parameters": [
+          {
+            "name": "enterpriseId",
+            "in": "path",
+            "required": true,
+            "description": "Multi Org ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Multi Org details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetEnterpriseResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied. The caller is not an administrator of this Multi Org.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Multi Org not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/enterprises/{enterpriseId}/orgs/{orgId}": {
+      "patch": {
+        "summary": "Update settings of an Organization in a Multi Org",
+        "tags": [
+          "Multi Org Management"
+        ],
+        "description": "Updates seat allocation of an Organization within a Multi Org.\n\nRate limit category: Medium API",
+        "parameters": [
+          {
+            "name": "enterpriseId",
+            "in": "path",
+            "required": true,
+            "description": "Multi Org ID.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEnterpriseOrgRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Organization updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateEnterpriseOrgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body or seat allocation exceeds Multi Org limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or Organization does not belong to this Multi Org.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Multi Org or Organization not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Seat allocation is less than current usage.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/orgs/{orgId}/hubs": {
+      "post": {
+        "summary": "Create a User Group",
+        "tags": [
+          "User Group Management"
+        ],
+        "description": "Creates a new User Group within an Organization.\n\nRate limit category: Slow API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHubRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The User Group was created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HubResponseItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Organization's User Group quota has been exceeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The Organization not found or no access to the Organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/orgs/{orgId}/hubs/{hubId}": {
+      "delete": {
+        "summary": "Delete a User Group",
+        "tags": [
+          "User Group Management"
+        ],
+        "description": "Deletes a User Group from an Organization.\n\nThe default User Group cannot be deleted.\n\nMembers who belong only to the deleted User Group can either be:\n- Transferred to the default User Group (when `transfer=true`)\n- Removed from the Organization entirely (when `transfer=false` or omitted)\n\nRate limit category: Medium API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hubId",
+            "in": "path",
+            "required": true,
+            "description": "User Group ID. Cannot be `default` as the default User Group cannot be deleted.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "transfer",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/BooleanStringType"
+            },
+            "description": "Determine whether the users who belong only to the deleted User Group are transferred\n to the default User Group or are removed from the Organization entirely.\n\nPossible values:\n- `true` \u2013 Represents a true boolean value.\n- `false` \u2013 Represents a false boolean value."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The User Group was deleted successfully."
+          },
+          "400": {
+            "description": "Invalid query parameters or the User Group is managed by SCIM.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller does not have permission to delete the User Group or attempting to delete the default User Group.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The Organization or User Group not found or no access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update a User Group",
+        "tags": [
+          "User Group Management"
+        ],
+        "description": "Updates an existing User Group within an Organization.\nCurrently supports updating the User Group name only.\n\nRate limit category: Medium API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hubId",
+            "in": "path",
+            "required": true,
+            "description": "User Group ID. Use `default` to refer to the default User Group of the Organization.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HubUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The User Group was updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HubResponseItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller does not have permission to update the User Group.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The Organization or User Group not found or no access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/orgs/{orgId}": {
+      "get": {
+        "summary": "Get information about an Organization and its User Groups",
+        "tags": [
+          "User Group Management"
+        ],
+        "description": "Get information about an Organization and its User Groups.\n\nRate limit category: Fast API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Organization details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The Organization not found or no access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/orgs/{orgId}/users": {
+      "post": {
+        "summary": "Add or invite Users to an Organization and its User Groups",
+        "tags": [
+          "Organization User Management"
+        ],
+        "description": "Add or invite Users, up to 20 at a time, to an Organization and its User Groups.\n\nIf an invited user is already a member of the Organization,\nthe user is added directly to the specified User Groups.\n\nIf an invited user is not a member of the Organization,\nthe user is invited to the Organization and the specified User Groups.\nThe user is added to the org after accepting the invite.\n\nRate limit category: Medium API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddOrgUsersRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "207": {
+            "description": "The request was processed. The results for individual users may be different.\nResponse body includes results for each requested email.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddOrgUsersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied or the resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "List Users in an Organization",
+        "tags": [
+          "Organization User Management"
+        ],
+        "description": "Returns Users in the Organization by the specified sorting order and filtering.\nSeveral filtering, sorting, and pagination options are available.\n\nRate limit category: Fast API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "effective_role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/RTEffectiveRole"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "Filter to limit the roles to be listed. If not specified, everyone is listed.\n\nPossible values:\n- `org_owner` \u2013 Organization Owner.\n- `org_admin` \u2013 Organization Administrator.\n- `space_admin` \u2013 Space Administrator.\n- `hub_admin` \u2013 User Group Administrator.\n- `hub_member` \u2013 User Group Member."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/GetOrgMemberListSortOptionType"
+            },
+            "description": "Sort option. If not specified, `name` is used.\n\nPossible values:\n- `name` \u2013 Sort by name in ascending order.\n- `-name` \u2013 Sort by name in descending order.\n- `email` \u2013 Sort by email in ascending order.\n- `-email` \u2013 Sort by email in descending order.\n- `date_last_activity` \u2013 Sort by date last activity in ascending order.\n- `-date_last_activity` \u2013 Sort by date last activity in descending order.\n- `date_joined` \u2013 Sort by date joined in ascending order.\n- `-date_joined` \u2013 Sort by date joined in descending order.\n- `num_started_speeches` \u2013 Sort by number of started speeches in ascending order.\n- `-num_started_speeches` \u2013 Sort by number of started speeches in descending order."
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Start index of the list. If not specified, 0 is used."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Maximum number of elements in paginated response. Maximum is 1000.\n If not specified, 20 is used as the default value."
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter to users who have this prefix for sorting field.\n This currently works only when `sort` is `email` or `-email`.\n The primary usage is to search for a single user by email address."
+          },
+          {
+            "name": "field",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/GetOrgMemberListFieldType"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "Optional fields to output.\n Specify only when needed because additional fields increase response time.\n\nPossible values:\n- `hubs` \u2013 Include the information of the User Groups which the user belongs to."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The list of users in the Organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMemberListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource not found or no access to the resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/orgs/{orgId}/hubs/{hubId}/users/remove": {
+      "post": {
+        "summary": "Remove Users and outstanding invites from a User Group",
+        "tags": [
+          "Organization User Management"
+        ],
+        "description": "Accepts up to 100 email addresses, removes the corresponding User Group memberships.\n\nIf users would lose access to all User Groups of the Organization,\nthey will be added to the fallback User Group.\n\nRate limit category: Medium API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hubId",
+            "in": "path",
+            "required": true,
+            "description": "User Group ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteHubUsersInvitesByEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "207": {
+            "description": "Request processed. Individual email results are returned in the response body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveHubUsersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied or the resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/orgs/{orgId}/users/remove": {
+      "post": {
+        "summary": "Remove Users and outstanding invites from an Organization",
+        "tags": [
+          "Organization User Management"
+        ],
+        "description": "Accepts up to 100 email addresses and removes them from the Organization\nif they are members of the Organization or deletes their pending invites.\n\nRate limit category: Medium API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteOrgUsersInvitesByEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "207": {
+            "description": "Request processed. Individual email results are returned in the response body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveOrgUsersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied or the resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/orgs/{orgId}/invites": {
+      "get": {
+        "summary": "List outstanding Invites for an Organization or a User Group",
+        "tags": [
+          "Organization User Management"
+        ],
+        "description": "Returns outstanding invites scoped to an Organization or a User Group.\nSeveral filtering, sorting, and pagination options are available.\n\nRate limit category: Fast API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/GetOrgInviteListSortOptionType"
+            },
+            "description": "Sort option.\n If not specified, invites are sorted by email in ascending order.\n\nPossible values:\n- `email` \u2013 Sort by email in ascending order.\n- `-email` \u2013 Sort by email in descending order.\n- `date_invited` \u2013 Sort by date invited in ascending order.\n- `-date_invited` \u2013 Sort by date invited in descending order."
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Start index of the list. If not specified, 0 is used."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Maximum number of elements in paginated response.\n Maximum is 1000.\n If not specified, 20 is used as the default value."
+          },
+          {
+            "name": "hub_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "User Group ID. If specified, limit the response to invites for a specific User Group."
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter invites matching a prefix for the selected sort field.\n Works only with `email` or `-email` sort options."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The list of outstanding invites for the Organization or User Group.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgInviteListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource not found or no access to the resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/orgs/{orgId}/members/expiration": {
+      "patch": {
+        "summary": "Set, update, or clear expiration dates on organization memberships",
+        "tags": [
+          "Organization User Management"
+        ],
+        "description": "Accepts up to 100 email addresses per request. For each member, sets\nor updates the membership expiration to the supplied UTC timestamp,\nor clears it when `expiration_date` is `null`. Returns a per-email\nresult for each address.\n\nRate limit category: Medium API",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "description": "Organization ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberExpirationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "207": {
+            "description": "Request processed. Individual results are returned in the response body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetMemberExpirationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied or the resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v3/speeches/{speechId}/feedback": {
+      "get": {
+        "summary": "Download speech feedback",
+        "tags": [
+          "Speech"
+        ],
+        "description": "Returns a recording's feedback: rubric goal scores, coaching feedback, reviewer\ncomments, and transcript.\n\nRate limit category: Fast API",
+        "parameters": [
+          {
+            "name": "speechId",
+            "in": "path",
+            "required": true,
+            "description": "Speech ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sections",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/RTFeedbackExportSection"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "Sections to include. May be repeated (e.g. `?sections=goals\u00a7ions=coaching_feedback`).\n All sections are included when omitted.\n\nPossible values:\n- `goals` \u2013 Goal/rubric scores and their feedback.\n- `coaching_feedback` \u2013 Coaching feedback remarks.\n- `user_comments` \u2013 Reviewer/user comments.\n- `transcript` \u2013 Full transcript."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The recording's AI Coaching feedback.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackJsonResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized to download this recording's feedback.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recording not found, or not accessible to the caller.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "GetEnterpriseResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "examples": [
+              "aBcD2345eFgH6789iJkm"
+            ],
+            "type": "string",
+            "description": "ID of the Multi Org."
+          },
+          "name": {
+            "examples": [
+              "Acme Enterprise"
+            ],
+            "type": "string",
+            "description": "Name of the Multi Org."
+          },
+          "seat_pool_total": {
+            "examples": [
+              500
+            ],
+            "type": "number",
+            "description": "Total number of seats in the Multi Org seat pool."
+          },
+          "seat_pool_allocated": {
+            "examples": [
+              400
+            ],
+            "type": "number",
+            "description": "Number of seats currently allocated from the Multi Org seat pool across all member Organizations."
+          },
+          "seat_pool_used": {
+            "examples": [
+              350
+            ],
+            "type": "number",
+            "description": "Number of seats currently in use across all member Organizations."
+          },
+          "admins": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "examples": [
+                    "aBcD2345eFgH6789iJkm"
+                  ],
+                  "type": "string",
+                  "description": "User ID."
+                },
+                "name": {
+                  "examples": [
+                    "Jordan Lee"
+                  ],
+                  "type": "string",
+                  "description": "Display name of the user."
+                },
+                "email": {
+                  "examples": [
+                    "admin@example.com"
+                  ],
+                  "type": "string",
+                  "description": "Email of the user."
+                }
+              },
+              "required": [
+                "user_id",
+                "name",
+                "email"
+              ]
+            },
+            "description": "List of administrator users for the Multi Org."
+          },
+          "member_orgs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "org_id": {
+                  "examples": [
+                    "aBcD2345eFgH6789iJkm"
+                  ],
+                  "type": "string",
+                  "description": "Organization ID."
+                },
+                "org_name": {
+                  "examples": [
+                    "Acme Corp"
+                  ],
+                  "type": "string",
+                  "description": "Name of the Organization."
+                },
+                "seats_allocated": {
+                  "examples": [
+                    50
+                  ],
+                  "type": "number",
+                  "description": "Number of seats allocated to this Organization from the Multi Org seat pool."
+                },
+                "seats_used": {
+                  "examples": [
+                    35
+                  ],
+                  "type": "number",
+                  "description": "Number of seats currently in use by this Organization."
+                },
+                "member_count": {
+                  "examples": [
+                    40
+                  ],
+                  "type": "number",
+                  "description": "Total number of members in the Organization."
+                },
+                "pending_invite_count": {
+                  "examples": [
+                    5
+                  ],
+                  "type": "number",
+                  "description": "Number of pending invites to the Organization."
+                },
+                "created_date": {
+                  "examples": [
+                    "2024-01-15T10:30:00.000Z"
+                  ],
+                  "type": "string",
+                  "description": "Date when the Organization was created in `YYYY-MM-DDTHH:mm:ss.sssZ` format."
+                }
+              },
+              "required": [
+                "org_id",
+                "org_name",
+                "seats_allocated",
+                "seats_used",
+                "member_count",
+                "pending_invite_count",
+                "created_date"
+              ]
+            },
+            "description": "List of member Organizations and their seat usage details."
+          },
+          "home_org_id": {
+            "examples": [
+              "aBcD2345eFgH6789iJkm",
+              null
+            ],
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID of the home org for global content broadcast. Null if not configured."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "seat_pool_total",
+          "seat_pool_allocated",
+          "seat_pool_used",
+          "admins",
+          "member_orgs",
+          "home_org_id"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message. This is for developers, and not for end users or translated."
+          },
+          "code": {
+            "type": "string",
+            "description": "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "UpdateEnterpriseOrgRequest": {
+        "type": "object",
+        "properties": {
+          "seats_allocated": {
+            "examples": [
+              50
+            ],
+            "type": "number",
+            "description": "New number of seats to allocate to the Organization from the Multi Org seat pool.\n Must be a non-negative integer and cannot be less than the current seat usage."
+          }
+        }
+      },
+      "UpdateEnterpriseOrgResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "examples": [
+              true
+            ],
+            "type": "boolean",
+            "description": "Whether the operation completed successfully."
+          }
+        },
+        "required": [
+          "success"
+        ]
+      },
+      "CreateHubRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "examples": [
+              "Sales Team",
+              "Engineering"
+            ],
+            "type": "string",
+            "description": "Name of the User Group to create."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "HubResponseItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "examples": [
+              "dE3f4gH5"
+            ],
+            "type": "string",
+            "description": "ID of the User Group."
+          },
+          "name": {
+            "examples": [
+              "Sales Team"
+            ],
+            "type": "string",
+            "description": "Name of the User Group."
+          },
+          "org_default": {
+            "examples": [
+              false
+            ],
+            "type": "boolean",
+            "description": "Whether this User Group is the default User Group of the Organization."
+          },
+          "creation_date": {
+            "examples": [
+              "2024-01-15T10:30:00.000Z"
+            ],
+            "type": "string",
+            "description": "The date and time when the User Group was created in `YYYY-MM-DDTHH:mm:ss.sssZ` format."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "org_default",
+          "creation_date"
+        ]
+      },
+      "BooleanStringType": {
+        "type": "string",
+        "enum": [
+          "true",
+          "false"
+        ],
+        "description": "Possible values:\n- `true` \u2013 Represents a true boolean value.\n- `false` \u2013 Represents a false boolean value."
+      },
+      "HubUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "examples": [
+              "Sales Team",
+              "Engineering"
+            ],
+            "type": "string",
+            "description": "New name of the User Group."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "OrgResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "examples": [
+              "aBcD2345eFgH6789iJkm"
+            ],
+            "type": "string",
+            "description": "Organization ID."
+          },
+          "name": {
+            "examples": [
+              "Acme Corporation"
+            ],
+            "type": "string",
+            "description": "Organization name."
+          },
+          "default_hub_id": {
+            "examples": [
+              "dE3f4gH5"
+            ],
+            "type": "string",
+            "description": "ID of the default User Group for this Organization."
+          },
+          "hubs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "examples": [
+                    "dE3f4gH5"
+                  ],
+                  "type": "string",
+                  "description": "ID of the User Group."
+                },
+                "name": {
+                  "examples": [
+                    "Sales Team"
+                  ],
+                  "type": "string",
+                  "description": "Name of the User Group."
+                },
+                "org_default": {
+                  "examples": [
+                    false
+                  ],
+                  "type": "boolean",
+                  "description": "Whether this User Group is the default User Group of the Organization."
+                },
+                "creation_date": {
+                  "examples": [
+                    "2024-01-15T10:30:00.000Z"
+                  ],
+                  "type": "string",
+                  "description": "The date and time when the User Group was created in `YYYY-MM-DDTHH:mm:ss.sssZ` format."
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "org_default",
+                "creation_date"
+              ]
+            },
+            "description": "List of User Groups in this Organization accessible to the caller.\n API for updating an Organization does not emit this field."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "default_hub_id"
+        ]
+      },
+      "AddOrgUsersRequest": {
+        "type": "object",
+        "properties": {
+          "emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Email addresses of the users to add or invite.\n At least one email must be specified."
+          },
+          "org_role": {
+            "examples": [
+              null
+            ],
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RTOrgRole"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pass `null`.\n Other values are reserved for Yoodli internal usage and future compatibility is not guaranteed."
+          },
+          "hub_role": {
+            "examples": [
+              "hub_member"
+            ],
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RTHubRole"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pass `hub_member`.\n Other values are reserved for Yoodli internal usage and future compatibility is not guaranteed."
+          },
+          "hub_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "User Group IDs to add or invite users to.\n Use `default` to refer to the Organization's default User Group."
+          },
+          "send_invite_email": {
+            "examples": [
+              true
+            ],
+            "type": "boolean",
+            "description": "Specify whether invitation emails are sent to the invited users."
+          },
+          "welcome_message": {
+            "examples": [
+              "Welcome to the cohort!"
+            ],
+            "type": "string",
+            "description": "Optional welcome message included in invitation emails.\n HTML tags are stripped."
+          },
+          "expiration_date": {
+            "examples": [
+              "2026-06-21T00:00:00.000Z"
+            ],
+            "type": "string",
+            "description": "The date and time when the invited members' org membership should expire\n in `YYYY-MM-DDTHH:mm:ss.sssZ` format. Omit for no expiration."
+          }
+        },
+        "required": [
+          "emails",
+          "org_role",
+          "hub_role",
+          "hub_ids",
+          "send_invite_email"
+        ]
+      },
+      "AddOrgUsersResponse": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "examples": [
+                    "mary@example.com"
+                  ],
+                  "type": "string",
+                  "description": "Email address of a target user."
+                },
+                "result": {
+                  "type": "string",
+                  "enum": [
+                    "added",
+                    "invite_without_email",
+                    "invite_with_email",
+                    "no_change",
+                    "no_more_license",
+                    "rejected",
+                    "invalid_expiration_date",
+                    "internal_error"
+                  ],
+                  "description": "The result of the operation for this user.\n\nPossible values:\n- `added` \u2013 The user was added to the specified Organization and User Groups with the requested role.\n- `invite_without_email` \u2013 The user was invited to the specified Organization and User Groups without sending email.\n- `invite_with_email` \u2013 The user was invited to the specified Organization and User Groups with the requested role.\n An invitation email was sent to the user.\n- `no_change` \u2013 The user is already satisfied the request. No changes were applied.\n- `no_more_license` \u2013 The Organization does not have enough licenses to add or invite this user.\n- `rejected` \u2013 The request was rejected. This typically happens when attempting to downgrade an existing role.\n- `invalid_expiration_date` \u2013 The supplied `expiration_date` is at or before the current time\n (or is not a valid UTC ISO 8601 timestamp). The user was NOT\n added or invited; no email was sent and no seat was consumed.\n- `internal_error` \u2013 An internal server error occurred after the request was accepted."
+                }
+              },
+              "required": [
+                "email",
+                "result"
+              ]
+            },
+            "description": "Results for each target user."
+          }
+        },
+        "required": [
+          "results"
+        ]
+      },
+      "RTEffectiveRole": {
+        "type": "string",
+        "enum": [
+          "org_owner",
+          "org_admin",
+          "space_admin",
+          "hub_admin",
+          "hub_member"
+        ],
+        "description": "Possible values:\n- `org_owner` \u2013 Organization Owner.\n- `org_admin` \u2013 Organization Administrator.\n- `space_admin` \u2013 Space Administrator.\n- `hub_admin` \u2013 User Group Administrator.\n- `hub_member` \u2013 User Group Member."
+      },
+      "GetOrgMemberListSortOptionType": {
+        "type": "string",
+        "enum": [
+          "name",
+          "-name",
+          "email",
+          "-email",
+          "date_last_activity",
+          "-date_last_activity",
+          "date_joined",
+          "-date_joined",
+          "num_started_speeches",
+          "-num_started_speeches"
+        ],
+        "description": "Possible values:\n- `name` \u2013 Sort by name in ascending order.\n- `-name` \u2013 Sort by name in descending order.\n- `email` \u2013 Sort by email in ascending order.\n- `-email` \u2013 Sort by email in descending order.\n- `date_last_activity` \u2013 Sort by date last activity in ascending order.\n- `-date_last_activity` \u2013 Sort by date last activity in descending order.\n- `date_joined` \u2013 Sort by date joined in ascending order.\n- `-date_joined` \u2013 Sort by date joined in descending order.\n- `num_started_speeches` \u2013 Sort by number of started speeches in ascending order.\n- `-num_started_speeches` \u2013 Sort by number of started speeches in descending order."
+      },
+      "GetOrgMemberListFieldType": {
+        "type": "string",
+        "enum": [
+          "hubs"
+        ],
+        "description": "Possible values:\n- `hubs` \u2013 Include the information of the User Groups which the user belongs to."
+      },
+      "OrgMemberListResponse": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "examples": [
+                    "aBcD2345eFgH6789iJkm"
+                  ],
+                  "type": "string",
+                  "description": "ID of the user"
+                },
+                "name": {
+                  "examples": [
+                    "John Smith"
+                  ],
+                  "type": "string",
+                  "description": "Display name of the user"
+                },
+                "email": {
+                  "examples": [
+                    "john@example.com"
+                  ],
+                  "type": "string",
+                  "description": "Email of the user"
+                },
+                "role": {
+                  "examples": [
+                    "org_owner"
+                  ],
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RTOrgRole"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Role of the user in the Organization. This is `null` if the user is not an Organization owner or an Organization admin."
+                },
+                "effective_role": {
+                  "examples": [
+                    "org_owner"
+                  ],
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RTEffectiveRole"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Effective role of the user in the Organization, which is the highest role which the user has in the Organization and any User Groups in the Organization."
+                },
+                "date_last_activity": {
+                  "examples": [
+                    "2025-01-01T00:00:00.000Z"
+                  ],
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Date and time when the user was last active in `YYYY-MM-DDTHH:mm:ss.sssZ` format."
+                },
+                "date_joined": {
+                  "examples": [
+                    "2025-01-01T00:00:00.000Z"
+                  ],
+                  "type": "string",
+                  "description": "Date and time when the user joined the Organization in `YYYY-MM-DDTHH:mm:ss.sssZ` format."
+                },
+                "num_started_speeches": {
+                  "examples": [
+                    10
+                  ],
+                  "type": "number",
+                  "description": "Number of speeches which the user has started."
+                },
+                "hubs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "hub_id": {
+                        "examples": [
+                          "dE3f"
+                        ],
+                        "type": "string",
+                        "description": "ID of the User Group"
+                      },
+                      "name": {
+                        "examples": [
+                          "Use group 4"
+                        ],
+                        "type": "string",
+                        "description": "Name of the User Group"
+                      },
+                      "role": {
+                        "type": "string",
+                        "enum": [
+                          "hub_admin",
+                          "hub_member"
+                        ],
+                        "description": "Role of the user in the User Group\n\nPossible values:\n- `hub_admin` \u2013 User Group Administrator.\n- `hub_member` \u2013 User Group Member.",
+                        "examples": [
+                          "hub_admin"
+                        ]
+                      },
+                      "date_joined": {
+                        "examples": [
+                          "2023-02-23T05:20:35.678Z"
+                        ],
+                        "type": "string",
+                        "description": "The date and time when the user joined the User Group in `YYYY-MM-DDTHH:mm:ss.sssZ` format."
+                      }
+                    },
+                    "required": [
+                      "hub_id",
+                      "name",
+                      "role",
+                      "date_joined"
+                    ]
+                  },
+                  "description": "User Groups which this user belongs to\n This becomes empty array if this field is not requested."
+                },
+                "expiration_date": {
+                  "examples": [
+                    "2026-05-16T04:59:59.999Z"
+                  ],
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "UTC timestamp when the user's membership expires, or `null` if no expiration is set."
+                }
+              },
+              "required": [
+                "user_id",
+                "name",
+                "email",
+                "role",
+                "effective_role",
+                "date_last_activity",
+                "date_joined",
+                "num_started_speeches",
+                "hubs",
+                "expiration_date"
+              ]
+            },
+            "description": "List of the users in the Organization."
+          },
+          "next": {
+            "examples": [
+              true
+            ],
+            "type": "boolean",
+            "description": "Whether there are more users to list."
+          },
+          "total": {
+            "examples": [
+              230
+            ],
+            "type": "number",
+            "description": "Total number of users for the current list."
+          }
+        },
+        "required": [
+          "users",
+          "next",
+          "total"
+        ]
+      },
+      "DeleteHubUsersInvitesByEmailRequest": {
+        "type": "object",
+        "properties": {
+          "user_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Email addresses of the users to remove. At least one email must be specified."
+          },
+          "fallback_hub_id": {
+            "examples": [
+              "default",
+              "daoeuj32Jqk"
+            ],
+            "type": "string",
+            "description": "User Group ID of the fallback.\n If any users who would otherwise lose access to all User Groups of the Organization,\n they will be added to this User Group.\n If the value is \"default\", the default User Group for the Organization will be used."
+          }
+        },
+        "required": [
+          "user_emails",
+          "fallback_hub_id"
+        ]
+      },
+      "RemoveHubUsersResponse": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "examples": [
+                    "member@example.com"
+                  ],
+                  "type": "string",
+                  "description": "Email address provided in the original request."
+                },
+                "success": {
+                  "examples": [
+                    true
+                  ],
+                  "type": "boolean",
+                  "description": "Indicates whether the membership or invite to this user was removed."
+                }
+              },
+              "required": [
+                "email",
+                "success"
+              ]
+            },
+            "description": "Individual removal results for each requested email."
+          }
+        },
+        "required": [
+          "results"
+        ]
+      },
+      "DeleteOrgUsersInvitesByEmailRequest": {
+        "type": "object",
+        "properties": {
+          "user_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Email addresses of the users to remove.\n At least one email must be specified."
+          }
+        },
+        "required": [
+          "user_emails"
+        ]
+      },
+      "RemoveOrgUsersResponse": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "examples": [
+                    "member@example.com"
+                  ],
+                  "type": "string",
+                  "description": "Email address provided in the request."
+                },
+                "success": {
+                  "examples": [
+                    true
+                  ],
+                  "type": "boolean",
+                  "description": "Indicates whether the membership or the invite to this user was removed."
+                }
+              },
+              "required": [
+                "email",
+                "success"
+              ]
+            },
+            "description": "Results for each requested email address."
+          }
+        },
+        "required": [
+          "results"
+        ]
+      },
+      "GetOrgInviteListSortOptionType": {
+        "type": "string",
+        "enum": [
+          "email",
+          "-email",
+          "date_invited",
+          "-date_invited"
+        ],
+        "description": "Possible values:\n- `email` \u2013 Sort by email in ascending order.\n- `-email` \u2013 Sort by email in descending order.\n- `date_invited` \u2013 Sort by date invited in ascending order.\n- `-date_invited` \u2013 Sort by date invited in descending order."
+      },
+      "OrgInviteListResponse": {
+        "type": "object",
+        "properties": {
+          "invites": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "examples": [
+                    "user@example.com"
+                  ],
+                  "type": "string",
+                  "description": "Email address of the invited user."
+                },
+                "name": {
+                  "examples": [
+                    "Jordan Lee",
+                    null
+                  ],
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Display name provided for the invite. This is `null` if no name is provided."
+                },
+                "role": {
+                  "examples": [
+                    "org_admin",
+                    null
+                  ],
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RTOrgRole"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Organization-level role that the user will have if the invite is accepted."
+                },
+                "effective_role": {
+                  "type": "string",
+                  "enum": [
+                    "org_owner",
+                    "org_admin",
+                    "space_admin",
+                    "hub_admin",
+                    "hub_member"
+                  ],
+                  "description": "Effective role which is the highest role that the user will have\n in the Organization by accepting this invite.\n `hub_member` is a typical end user who joins one or more User Groups\n and does not have any level of administrative privileges anywhere.\n\nPossible values:\n- `org_owner` \u2013 Organization Owner.\n- `org_admin` \u2013 Organization Administrator.\n- `space_admin` \u2013 Space Administrator.\n- `hub_admin` \u2013 User Group Administrator.\n- `hub_member` \u2013 User Group Member.",
+                  "examples": [
+                    "hub_member"
+                  ]
+                },
+                "date_invited": {
+                  "examples": [
+                    "2024-10-24T04:18:12.345Z"
+                  ],
+                  "type": "string",
+                  "description": "The date and time when the invite was last updated or sent in `YYYY-MM-DDTHH:mm:ss.sssZ` format."
+                },
+                "hubs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "hub_id": {
+                        "examples": [
+                          "adahbAHKD87"
+                        ],
+                        "type": "string",
+                        "description": "User Group ID."
+                      },
+                      "role": {
+                        "type": "string",
+                        "enum": [
+                          "hub_admin",
+                          "hub_member"
+                        ],
+                        "description": "Role that the user will have in the User Group.",
+                        "examples": [
+                          "hub_member"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "hub_id",
+                      "role"
+                    ]
+                  },
+                  "description": "User Groups and corresponding roles that the user will have if the invite is accepted."
+                },
+                "expiration_date": {
+                  "examples": [
+                    "2024-10-24T04:18:12.345Z",
+                    null
+                  ],
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "UTC ISO 8601 timestamp for when the accepted membership will\n expire, or `null` when no end date is stamped on the invite.\n Mirrors `OrgMemberResponse.expiration_date` so the frontend can\n treat invite rows and member rows identically."
+                }
+              },
+              "required": [
+                "email",
+                "name",
+                "role",
+                "effective_role",
+                "date_invited",
+                "hubs",
+                "expiration_date"
+              ]
+            },
+            "description": "List of outstanding invites for the Organization or User Group."
+          },
+          "next": {
+            "examples": [
+              true
+            ],
+            "type": "boolean",
+            "description": "Whether there are more invites to list."
+          },
+          "total": {
+            "examples": [
+              105
+            ],
+            "type": "number",
+            "description": "Total number of invites for the current list."
+          }
+        },
+        "required": [
+          "invites",
+          "next",
+          "total"
+        ]
+      },
+      "UpdateMemberExpirationRequest": {
+        "type": "object",
+        "properties": {
+          "emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Email addresses of the members whose expiration date should be\n set or cleared."
+          },
+          "expiration_date": {
+            "examples": [
+              "2026-06-21T00:00:00.000Z"
+            ],
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The date and time when the memberships should expire in\n `YYYY-MM-DDTHH:mm:ss.sssZ` format, or `null` to clear the expiration."
+          }
+        },
+        "required": [
+          "emails",
+          "expiration_date"
+        ]
+      },
+      "SetMemberExpirationResponse": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "examples": [
+                    "user@example.com"
+                  ],
+                  "type": "string",
+                  "description": "Email address this result applies to."
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "success",
+                    "invalid_email",
+                    "not_found",
+                    "owner_cannot_expire",
+                    "scim_managed",
+                    "invalid_date",
+                    "internal_error"
+                  ],
+                  "description": "The result of the operation for this member.\n\nPossible values:\n- `success` \u2013 Expiration was set, updated, or cleared successfully.\n- `invalid_email` \u2013 The request email could not be parsed as a valid email address.\n- `not_found` \u2013 No membership found for this email in the organization.\n- `owner_cannot_expire` \u2013 Target user is the org owner \u2014 expiration cannot be set on owners.\n- `scim_managed` \u2013 Target user is managed by SCIM \u2014 expiration must be removed\n before SCIM can manage.\n- `invalid_date` \u2013 The computed UTC expiration date is in the past.\n- `internal_error` \u2013 An unexpected error occurred while processing this user."
+                }
+              },
+              "required": [
+                "email",
+                "status"
+              ]
+            },
+            "description": "Individual results for each requested email."
+          }
+        },
+        "required": [
+          "results"
+        ]
+      },
+      "RTFeedbackExportSection": {
+        "type": "string",
+        "enum": [
+          "goals",
+          "coaching_feedback",
+          "user_comments",
+          "transcript"
+        ],
+        "description": "Possible values:\n- `goals` \u2013 Goal/rubric scores and their feedback.\n- `coaching_feedback` \u2013 Coaching feedback remarks.\n- `user_comments` \u2013 Reviewer/user comments.\n- `transcript` \u2013 Full transcript."
+      },
+      "FeedbackJsonResponse": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "examples": [
+              "2.0"
+            ],
+            "type": "string",
+            "description": "Schema version (`major.minor`; minor bumps are additive, major are breaking)."
+          },
+          "exported_at": {
+            "examples": [
+              "2026-02-11T15:00:00.000Z"
+            ],
+            "type": "string",
+            "description": "ISO 8601 timestamp when the export was generated."
+          },
+          "recording": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "examples": [
+                  "aBcD2345eFgH6789iJkm"
+                ],
+                "type": "string",
+                "description": "Recording identifier (the speech slug)."
+              },
+              "title": {
+                "examples": [
+                  "Q3 Sales Pitch Practice"
+                ],
+                "type": "string",
+                "description": "Recording title."
+              },
+              "date": {
+                "examples": [
+                  "2026-02-11T10:00:00.000Z"
+                ],
+                "type": "string",
+                "description": "ISO 8601 timestamp of the recording."
+              },
+              "duration_seconds": {
+                "examples": [
+                  184
+                ],
+                "oneOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Recording duration in seconds, or null when unavailable."
+              },
+              "type": {
+                "examples": [
+                  "LIVE"
+                ],
+                "type": "string",
+                "description": "Recording type."
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "date",
+              "duration_seconds",
+              "type"
+            ],
+            "description": "Recording metadata."
+          },
+          "speakers": {
+            "type": "object",
+            "description": "Everyone who spoke in the recording, keyed by speaker ID. Human speakers use a\n numeric ID (as a string, e.g. `\"0\"`) that matches the `speaker_id` on transcript\n lines and feedback entries; AI participants use an ID starting with `ai_`."
+          },
+          "coaching_feedback_hidden": {
+            "type": "boolean",
+            "description": "True when AI feedback is hidden from caller; When true, the `goals`,\n `coaching_feedback`, and `user_comments` sections are then empty"
+          },
+          "coaching_feedback_override_message": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Message shown in place of coaching feedback when it is hidden, or null."
+          },
+          "goals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "goal_id": {
+                  "examples": [
+                    "pace_control"
+                  ],
+                  "type": "string",
+                  "description": "Stable identifier of the goal."
+                },
+                "goal_name": {
+                  "examples": [
+                    "Pace Control"
+                  ],
+                  "type": "string",
+                  "description": "Human-readable goal name."
+                },
+                "goal_kind": {
+                  "type": "string",
+                  "enum": [
+                    "score",
+                    "binary",
+                    "compound",
+                    "talking_points",
+                    "unscored"
+                  ],
+                  "description": "The goal type; determines which score fields are present.\n\nPossible values:\n- `score`\n- `binary`\n- `compound`\n- `talking_points`\n- `unscored`"
+                },
+                "speaker_id": {
+                  "oneOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ID of the speaker the goal was evaluated for, matching a key in the `speakers` map,\n or null when the goal applies to the whole recording."
+                },
+                "short_feedback": {
+                  "examples": [
+                    "You maintained a steady, confident pace throughout."
+                  ],
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "One-line feedback, or null when unavailable."
+                },
+                "long_feedback": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Detailed feedback, or null when unavailable."
+                },
+                "human_evaluation": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Human reviewer's evaluation, or null when none."
+                },
+                "score_numerator": {
+                  "examples": [
+                    4
+                  ],
+                  "type": "number",
+                  "description": "Points scored. Present for `score`, `compound`, and `talking_points` goals."
+                },
+                "score_denominator": {
+                  "examples": [
+                    5
+                  ],
+                  "type": "number",
+                  "description": "Maximum score. Present for `score`, `compound`, and `talking_points` goals."
+                },
+                "score": {
+                  "examples": [
+                    1
+                  ],
+                  "type": "number",
+                  "description": "Whether the goal was met: 1 (met) or 0 (not met). Present for `binary` goals."
+                },
+                "sub_scores": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Sub-score name."
+                      },
+                      "score_numerator": {
+                        "type": "number",
+                        "description": "Points scored for this component."
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "score_numerator"
+                    ]
+                  },
+                  "description": "Named component scores. Present for `compound` goals."
+                },
+                "talking_points_hit": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Talking points fully covered. Present for `talking_points` goals."
+                },
+                "talking_points_partial": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Talking points partially covered. Present for `talking_points` goals."
+                },
+                "talking_points_miss": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Talking points not covered. Present for `talking_points` goals."
+                }
+              },
+              "required": [
+                "goal_id",
+                "goal_name",
+                "goal_kind",
+                "speaker_id",
+                "short_feedback",
+                "long_feedback",
+                "human_evaluation"
+              ]
+            },
+            "description": "Goal results. Present only when the `goals` section is requested."
+          },
+          "coaching_feedback": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "remark_id": {
+                  "examples": [
+                    "conciseness"
+                  ],
+                  "type": "string",
+                  "description": "Identifier of the coaching type."
+                },
+                "speaker_id": {
+                  "oneOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ID of the speaker the feedback applies to, matching a key in the `speakers` map,\n or null when the feedback applies to the whole recording."
+                },
+                "short_feedback": {
+                  "examples": [
+                    "Aim to get to your main point sooner."
+                  ],
+                  "type": "string",
+                  "description": "One-line feedback."
+                },
+                "long_feedback": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Detailed feedback, or null when unavailable."
+                },
+                "created_at": {
+                  "examples": [
+                    "2026-02-11T10:05:00.000Z"
+                  ],
+                  "type": "string",
+                  "description": "ISO 8601 timestamp when the feedback was created."
+                }
+              },
+              "required": [
+                "remark_id",
+                "speaker_id",
+                "short_feedback",
+                "long_feedback",
+                "created_at"
+              ]
+            },
+            "description": "Coaching feedback. Present only when the `coaching_feedback` section is requested."
+          },
+          "user_comments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "commenter_name": {
+                  "examples": [
+                    "Jordan Lee"
+                  ],
+                  "type": "string",
+                  "description": "Display name of the commenter."
+                },
+                "date": {
+                  "examples": [
+                    "2026-02-11T14:22:00.000Z"
+                  ],
+                  "type": "string",
+                  "description": "ISO 8601 timestamp when the comment was made."
+                },
+                "timestamp_seconds": {
+                  "examples": [
+                    42.5
+                  ],
+                  "oneOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Video position the comment is anchored to, in seconds, or null when not anchored."
+                },
+                "comment": {
+                  "examples": [
+                    "Strong close \u2014 this landed well."
+                  ],
+                  "type": "string",
+                  "description": "The comment text."
+                }
+              },
+              "required": [
+                "commenter_name",
+                "date",
+                "timestamp_seconds",
+                "comment"
+              ]
+            },
+            "description": "Reviewer/user comments. Present only when the `user_comments` section is requested."
+          },
+          "transcript": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "speaker_id": {
+                  "examples": [
+                    0
+                  ],
+                  "oneOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "ID of the person who said this line, matching a key in the `speakers` map, or null\n when the line was spoken by the AI. `speaker_name` always gives the display name."
+                },
+                "speaker_name": {
+                  "examples": [
+                    "Alex Rivera"
+                  ],
+                  "type": "string",
+                  "description": "Display name of the speaker for this line."
+                },
+                "start_seconds": {
+                  "examples": [
+                    12.3
+                  ],
+                  "type": "number",
+                  "description": "Line start offset from the beginning of the recording, in seconds."
+                },
+                "end_seconds": {
+                  "examples": [
+                    15.8
+                  ],
+                  "type": "number",
+                  "description": "Line end offset from the beginning of the recording, in seconds."
+                },
+                "text": {
+                  "examples": [
+                    "Thanks for taking the time to meet with me today."
+                  ],
+                  "type": "string",
+                  "description": "Transcribed text of the line."
+                }
+              },
+              "required": [
+                "speaker_id",
+                "speaker_name",
+                "start_seconds",
+                "end_seconds",
+                "text"
+              ]
+            },
+            "description": "Transcript lines. Present only when the `transcript` section is requested."
+          }
+        },
+        "required": [
+          "version",
+          "exported_at",
+          "recording",
+          "speakers",
+          "coaching_feedback_hidden",
+          "coaching_feedback_override_message"
+        ]
+      },
+      "RTOrgRole": {
+        "type": "string",
+        "enum": [
+          "org_owner",
+          "org_admin"
+        ],
+        "description": "Possible values:\n- `org_owner` \u2013 Organization Owner.\n- `org_admin` \u2013 Organization Administrator."
+      },
+      "RTHubRole": {
+        "type": "string",
+        "enum": [
+          "hub_admin",
+          "hub_member"
+        ],
+        "description": "Possible values:\n- `hub_admin` \u2013 User Group Administrator.\n- `hub_member` \u2013 User Group Member."
+      }
+    }
+  }
+}

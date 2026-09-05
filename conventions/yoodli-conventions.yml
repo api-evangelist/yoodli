@@ -1,0 +1,143 @@
+generated: '2026-09-04'
+method: searched
+source:
+- https://developers.yoodli.ai/docs/api-keys
+- https://developers.yoodli.ai/docs/rate-limit
+- https://developers.yoodli.ai/docs/getting-help
+- https://developers.yoodli.ai/docs/terminology
+- openapi/yoodli-api-openapi.yml
+base_url: https://app.yoodli.ai/api
+authentication:
+  style: bearer-api-key
+  header: 'Authorization: Bearer <API key>'
+  scheme: BearerAuth (http/bearer in components.securitySchemes)
+  key_prefix: null
+  issuance: 'Created in the Yoodli app: Admin view -> Org Settings -> "Access and SSO" -> "Organization Management
+    API" -> Manage -> Create API key. Multi Org keys: Org Settings -> "Manage Multi Org" -> Settings -> Access ->
+    "Multi Org Management API".'
+  roles:
+  - Organization Administrator
+  - Organization Owner
+  - Multi Org Administrator
+  max_keys: 3
+  expiry: Expiration date chosen at creation, or "Never expires"
+  shown_once: true
+  docs: https://developers.yoodli.ai/docs/api-keys
+idempotency:
+  coverage: none
+  header: null
+  retention: null
+  note: 'Yoodli documents no idempotency key and the OpenAPI declares no Idempotency-Key parameter on any of the
+    7 mutating operations. The bulk write operations (POST users, POST users/remove, PATCH members/expiration, POST
+    hubs/{hubId}/users/remove) return 207 Multi-Status with a per-email result, which makes a partial failure legible
+    and a retry semantically safe for those four because they are set-membership operations and therefore naturally
+    idempotent by outcome — but that is a property of the resource, not a replay-protection contract the provider
+    offers. POST /v3/orgs/{orgId}/hubs (Create a User Group) is NOT naturally idempotent: a retried call creates
+    a second User Group.'
+  evidence: no parameter matching /idempoten/i in openapi/yoodli-api-openapi.yml
+pagination:
+  style: offset
+  params:
+    start: Start index of the list; 0 if omitted
+    limit: Maximum elements per page; default 20, maximum 1000
+  sort_param: sort (name/-name/email/-email and date fields; leading "-" = descending)
+  filter_params:
+  - effective_role
+  - prefix
+  - hub_id
+  - field
+  applies_to:
+  - GET /v3/orgs/{orgId}/users
+  - GET /v3/orgs/{orgId}/invites
+  response_fields_note: Response returns the page items; see OrgMemberListResponse / OrgInviteListResponse in the
+    spec.
+sparse_fields:
+  supported: true
+  param: field
+  note: GET /v3/orgs/{orgId}/users accepts field=hubs to opt into extra data; Yoodli documents that additional fields
+    increase response time.
+request_tracing:
+  response_header: x-request-id
+  note: Yoodli asks for the x-request-id response header value on every support ticket.
+  docs: https://developers.yoodli.ai/docs/getting-help
+versioning:
+  style: uri-path
+  current: v3
+  header: null
+  note: All published operations are under /v3/. No version header or date-pinned version is documented.
+error_envelope:
+  shape: '{"error": "<developer message>", "code": "<error code>"}'
+  schema: components.schemas.ErrorResponse
+  required:
+  - error
+  problem_json: false
+  note: Bespoke envelope, not RFC 9457 application/problem+json. "error" is explicitly documented as developer-facing
+    and untranslated; "code" is optional and only some failures carry it.
+bulk_semantics:
+  status: 207
+  limits:
+    add_or_invite_users: 20
+    remove_users: 100
+    remove_hub_users: 100
+    member_expiration: 100
+  note: Bulk operations return 207 Multi-Status with a per-email result rather than failing the batch.
+rate_limit_signaling:
+  documented_headers: []
+  status_on_exhaustion: 429
+  see: rate-limits/yoodli-rate-limits.yml
+reversibility:
+  grade: documented
+  note: Yoodli publishes reversal paths for its membership writes but states no time window for any of them, so
+    this grades documented rather than verified. No window is asserted here that the docs do not state.
+  write_surfaces:
+  - operation: POST /v3/orgs/{orgId}/users
+    action: Add or invite users to an Organization / User Groups
+    reversal: POST /v3/orgs/{orgId}/users/remove (removes members and deletes pending invites)
+    window: null
+    window_documented: false
+    docs: https://developers.yoodli.ai/docs/managing-organization-users
+  - operation: POST /v3/orgs/{orgId}/hubs
+    action: Create a User Group
+    reversal: DELETE /v3/orgs/{orgId}/hubs/{hubId}
+    window: null
+    window_documented: false
+    docs: https://developers.yoodli.ai/docs/managing-user-groups
+  - operation: DELETE /v3/orgs/{orgId}/hubs/{hubId}
+    action: Delete a User Group
+    reversal: null
+    window: null
+    window_documented: false
+    note: 'Not reversible. The blast radius is controlled at call time instead, by the transfer query parameter:
+      transfer=true moves members who belonged only to the deleted group into the default User Group; transfer=false
+      (or omitted) removes them from the Organization entirely. An agent should treat transfer=false as destructive.
+      The default User Group cannot be deleted at all.'
+  - operation: PATCH /v3/orgs/{orgId}/members/expiration
+    action: Set membership expiration
+    reversal: 'PATCH /v3/orgs/{orgId}/members/expiration with expiration_date: null (clears it)'
+    window: null
+    window_documented: false
+  - operation: PATCH /v3/orgs/{orgId}/hubs/{hubId}
+    action: Rename a User Group
+    reversal: PATCH the same operation with the previous name
+    window: null
+    window_documented: false
+  - operation: PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+    action: Change Multi Org seat allocation
+    reversal: PATCH the same operation with the previous allocation
+    window: null
+    window_documented: false
+    note: 'Guarded rather than reversible: a reduction below current usage is rejected with 409.'
+  - operation: POST /v3/orgs/{orgId}/users/remove
+    action: Remove users / delete pending invites
+    reversal: POST /v3/orgs/{orgId}/users (re-invite); the removed users' history is not restored by it
+    window: null
+    window_documented: false
+dry_run_mode:
+  supported: false
+  note: No dry-run, preview or validate-only mode is documented or present in the spec.
+cross_links:
+  errors: errors/yoodli-problem-types.yml
+  lifecycle: lifecycle/yoodli-lifecycle.yml
+  authentication: authentication/yoodli-authentication.yml
+  rate_limits: rate-limits/yoodli-rate-limits.yml
+  data_model: data-model/yoodli-data-model.yml

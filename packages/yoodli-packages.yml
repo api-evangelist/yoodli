@@ -1,0 +1,56 @@
+generated: '2026-09-04'
+method: searched
+source:
+- https://registry.npmjs.org/-/v1/search?text=yoodli
+- https://pypi.org/pypi/yoodli/json
+- https://api.github.com/orgs/yoodli/repos
+- https://developers.yoodli.ai/llms.txt
+package_count: 0
+packages: []
+registries_probed:
+- registry: npm
+  query: https://registry.npmjs.org/-/v1/search?text=yoodli
+  result: 'total: 0'
+  version: null
+- registry: pypi
+  query: https://pypi.org/pypi/yoodli/json
+  result: HTTP 404
+  version: null
+- registry: github
+  query: https://api.github.com/orgs/yoodli/repos
+  result: 6 public repos, none an SDK
+  version: null
+github_org:
+  url: https://github.com/Yoodli
+  public_repos: 6
+  created: '2021-11-28'
+  repos:
+  - name: typesaurus-react
+    url: https://github.com/Yoodli/typesaurus-react
+    last_push: '2022-08-17'
+    note: temporary fork of a third-party Firestore ODM React binding — not a Yoodli client library
+  - name: group-sort-imports
+    url: https://github.com/Yoodli/group-sort-imports
+    last_push: '2023-11-27'
+    note: internal VS Code extension for sorting TS/JSX imports
+  - name: releases
+    url: https://github.com/Yoodli/releases
+    last_push: '2025-01-04'
+    note: release artifacts, not a library
+  - name: test-releases
+    url: https://github.com/Yoodli/test-releases
+    last_push: '2023-06-01'
+    note: test release channel
+  - name: firebase_functions_tutorial
+    url: https://github.com/Yoodli/firebase_functions_tutorial
+    last_push: '2024-07-29'
+    note: tutorial code
+  - name: nodejs-firestore-experiment
+    url: https://github.com/Yoodli/nodejs-firestore-experiment
+    last_push: '2024-07-20'
+    note: experiment
+note: 'Yoodli publishes NO first-party client library in any package registry, and its GitHub org holds no SDK —
+  the six public repos are a third-party fork, an internal editor extension, release channels and two experiments,
+  none pushed since January 2025. The developer portal offers ReadMe-generated per-language code snippets on each
+  reference page instead of a maintained SDK. No SDKs pointer is emitted: there is no official client library to
+  point at.'

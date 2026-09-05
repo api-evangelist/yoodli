@@ -1,0 +1,55 @@
+generated: '2026-09-04'
+method: searched
+source: https://developers.yoodli.ai/changelog
+url: https://developers.yoodli.ai/changelog
+scheme:
+  style: date-stamped release notes
+  api_version_path: v3
+  spec_version: 1.0.0 (info.version in the published OpenAPI)
+  portal_branch: 2026-01-06 (ReadMe branch/version label on the developer portal)
+current_version: v3
+entry_count: 6
+entries:
+- date: '2026-07-14'
+  title: Added "Download Speech Feedback" API
+  breaking: false
+  additions:
+  - GET /v3/speeches/{speechId}/feedback
+  url: https://developers.yoodli.ai/changelog/2026-07-14
+- date: '2026-01-23'
+  title: Created Yoodli Web Embed API Developer Guide
+  breaking: false
+  additions:
+  - Web Embed API guide (iframe + postMessage)
+  url: https://developers.yoodli.ai/changelog/2026-01-23
+- date: '2026-01-06'
+  title: Added "List User Groups in an Organization" API
+  breaking: false
+  additions:
+  - GET /v3/orgs/{orgId} (Organization and its User Groups)
+  url: https://developers.yoodli.ai/changelog/2026-01-06
+- date: '2025-12-30'
+  title: API for Managing User Groups is now available
+  breaking: false
+  additions:
+  - POST /v3/orgs/{orgId}/hubs
+  - PATCH /v3/orgs/{orgId}/hubs/{hubId}
+  - DELETE /v3/orgs/{orgId}/hubs/{hubId}
+  url: https://developers.yoodli.ai/changelog/2025-12-30
+- date: '2025-12-16'
+  title: API for Managing Multi Org is now available
+  breaking: false
+  additions:
+  - GET /v3/enterprises/{enterpriseId}
+  - PATCH /v3/enterprises/{enterpriseId}/orgs/{orgId}
+  url: https://developers.yoodli.ai/changelog/2025-12-16
+- date: '2025-12-11'
+  title: API for Organization User Management is now available
+  breaking: false
+  additions:
+  - GET/POST /v3/orgs/{orgId}/users
+  - POST /v3/orgs/{orgId}/users/remove
+  - GET /v3/orgs/{orgId}/invites
+  url: https://developers.yoodli.ai/changelog/2025-12-11
+note: The public API is young — the first entry is 2025-12-11. Every entry to date is additive; no breaking change
+  or deprecation has been published.

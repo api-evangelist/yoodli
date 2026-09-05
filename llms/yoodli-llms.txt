@@ -1,0 +1,41 @@
+# Yoodli Developer Portal Documentation
+
+> Documentation for Yoodli Developer Portal
+
+Append .md to any documentation page URL to get its markdown version.
+
+## Guides
+- [Introduction](https://developers.yoodli.ai/docs/introduction.md): Welcome to the Yoodli Developer Portal.
+- [Quickstart](https://developers.yoodli.ai/docs/quickstart.md): Make your first API call in just a few simple steps using our interactive API reference.
+- [API Keys](https://developers.yoodli.ai/docs/api-keys.md): Learn how to create API keys for Yoodli's REST API.
+- [MCP server (optional)](https://developers.yoodli.ai/docs/mcp.md): Connect your AI-powered development tools to the Yoodli Developer Portal.
+- [Getting Help & Support](https://developers.yoodli.ai/docs/getting-help.md): Get fast and effective support for REST API issues.
+- [Rate Limits](https://developers.yoodli.ai/docs/rate-limit.md): API rate limits and throttling policies by endpoint category.
+- [Terminology](https://developers.yoodli.ai/docs/terminology.md): Learn about terminology differences between the API and the application.
+- [Managing Organization Users](https://developers.yoodli.ai/docs/managing-organization-users.md): Learn how to use the Yoodli API to manage users in your organization.
+- [Managing User Groups](https://developers.yoodli.ai/docs/managing-user-groups.md): Learn how to manage User Groups using the Yoodi API, including creating, updating, and deleting groups.
+- [Managing Multi Org](https://developers.yoodli.ai/docs/managing-multi-org.md): Learn how to use the Yoodli API to manage Multi Org.
+- [Yoodli Web Embed API](https://developers.yoodli.ai/docs/web-embed-api.md): Developer guide for embedding Yoodli activities in your application using iframe + postMessage.
+
+## API Reference
+- [List Users in an Organization](https://developers.yoodli.ai/reference/get_v3-orgs-orgid-users.md): Returns Users in the Organization by the specified sorting order and filtering. Several filtering, sorting, and pagination options are available.  Rate limit category: Fast API
+- [Add or invite Users to an Organization and its User Groups](https://developers.yoodli.ai/reference/post_v3-orgs-orgid-users.md): Add or invite Users, up to 20 at a time, to an Organization and its User Groups.  If an invited user is already a member of the Organization, the user is added directly to the specified User Groups.  If an invited user is not a member of the Organization, the user is invited to the Organization and the specified User Groups. The user is added to the org after accepting the invite.  Rate limit category: Medium API
+- [List outstanding Invites for an Organization or a User Group](https://developers.yoodli.ai/reference/get_v3-orgs-orgid-invites.md): Returns outstanding invites scoped to an Organization or a User Group. Several filtering, sorting, and pagination options are available.  Rate limit category: Fast API
+- [Remove Users and outstanding invites from a User Group](https://developers.yoodli.ai/reference/post_v3-orgs-orgid-hubs-hubid-users-remove.md): Accepts up to 100 email addresses, removes the corresponding User Group memberships.  If users would lose access to all User Groups of the Organization, they will be added to the fallback User Group.  Rate limit category: Medium API
+- [Remove Users and outstanding invites from an Organization](https://developers.yoodli.ai/reference/post_v3-orgs-orgid-users-remove.md): Accepts up to 100 email addresses and removes them from the Organization if they are members of the Organization or deletes their pending invites.  Rate limit category: Medium API
+- [Set, update, or clear expiration dates on organization memberships](https://developers.yoodli.ai/reference/patch_v3-orgs-orgid-members-expiration.md): Accepts up to 100 email addresses per request. For each member, sets or updates the membership expiration to the supplied UTC timestamp, or clears it when `expiration_date` is `null`. Returns a per-email result for each address.  Rate limit category: Medium API
+- [Create a User Group](https://developers.yoodli.ai/reference/post_v3-orgs-orgid-hubs.md): Creates a new User Group within an Organization.  Rate limit category: Slow API
+- [Update a User Group](https://developers.yoodli.ai/reference/patch_v3-orgs-orgid-hubs-hubid.md): Updates an existing User Group within an Organization. Currently supports updating the User Group name only.  Rate limit category: Medium API
+- [Delete a User Group](https://developers.yoodli.ai/reference/delete_v3-orgs-orgid-hubs-hubid.md): Deletes a User Group from an Organization.  The default User Group cannot be deleted.  Members who belong only to the deleted User Group can either be: - Transferred to the default User Group (when `transfer=true`) - Removed from the Organization entirely (when `transfer=false` or omitted)  Rate limit category: Medium API
+- [Get information about an Organization and its User Groups](https://developers.yoodli.ai/reference/get_v3-orgs-orgid.md): Get information about an Organization and its User Groups.  Rate limit category: Fast API
+- [Get Multi Org details](https://developers.yoodli.ai/reference/get_v3-enterprises-enterpriseid.md): Retrieves detailed information about a Multi Org including administrators, member Organizations, and seat pool usage statistics.  Rate limit category: Fast API
+- [Update settings of an Organization in a Multi Org](https://developers.yoodli.ai/reference/patch_v3-enterprises-enterpriseid-orgs-orgid.md): Updates seat allocation of an Organization within a Multi Org.  Rate limit category: Medium API
+- [Download speech feedback](https://developers.yoodli.ai/reference/get_v3-speeches-speechid-feedback.md): Returns a recording's feedback: rubric goal scores, coaching feedback, reviewer comments, and transcript.  Rate limit category: Fast API
+
+## Changelog
+- [2026-07-14](https://developers.yoodli.ai/changelog/2026-07-14.md)
+- [2026-01-23](https://developers.yoodli.ai/changelog/2026-01-23.md)
+- [2026-01-06](https://developers.yoodli.ai/changelog/2026-01-06.md)
+- [2025-12-30](https://developers.yoodli.ai/changelog/2025-12-30.md)
+- [2025-12-16](https://developers.yoodli.ai/changelog/2025-12-16.md)
+- [2025-12-11](https://developers.yoodli.ai/changelog/2025-12-11.md)

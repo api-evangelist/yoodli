@@ -1,0 +1,21 @@
+generated: '2026-09-04'
+method: searched
+source: https://developers.yoodli.ai/docs/web-embed-api
+docs: https://developers.yoodli.ai/docs/web-embed-api
+component_count: 1
+families:
+- family: Web Embed
+  kind: iframe embed
+  loader_library: null
+  description: Embeds a Yoodli activity (roleplay / practice session) inside a host application as an iframe, with
+    a browser postMessage channel back to the parent window. Yoodli ships no JavaScript loader library, no npm package
+    and no web component — the host writes the iframe and the message listener itself.
+  components:
+  - name: Yoodli activity iframe
+    embed_origin: https://app.yoodli.ai
+    transport: HTML5 postMessage (cross-origin)
+    security_requirement: Yoodli documents verifying event.origin !== 'https://app.yoodli.ai' before processing
+      any message, plus iframe sandbox attributes.
+    setup_docs: https://developers.yoodli.ai/docs/web-embed-api
+note: 'Distinct from an SDK: this is the only client-side surface Yoodli publishes, and it is the only way to receive
+  a Yoodli event in near-real time — there is no server-side webhook.'

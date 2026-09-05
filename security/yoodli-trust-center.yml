@@ -1,0 +1,37 @@
+generated: '2026-09-04'
+method: searched
+probe: true
+url: https://trust.yoodli.ai/
+platform: Vanta trust report
+linked_from: https://yoodli.ai/ (homepage footer, twice)
+certifications:
+- SOC 2 Type 2
+- GDPR
+certifications_source: https://yoodli.ai/privacy
+evidence:
+- source: https://trust.yoodli.ai/
+  http_status: 200
+  bytes: 6378
+  keywords:
+  - Yoodli Trust Center
+  - vanta (x21)
+  note: 'Live and reachable, but client-rendered: the served HTML is a 6,378-byte Vanta shell that loads everything
+    from assets.vanta.com. No certification name, subprocessor list or security contact could be read from the response
+    body, so the certification list here is NOT taken from this page.'
+- source: https://yoodli.ai/privacy
+  http_status: 200
+  bytes: 172507
+  keywords:
+  - SOC2 (x4)
+  - SOC 2 Type 2
+  - GDPR
+  note: Yoodli's own privacy policy is server-rendered and names SOC 2 Type 2 and GDPR directly. This is the machine-readable
+    source for the claim.
+- source: https://app.vanta.com/doc?s=ksgyk5j5biz8letqaidv4a
+  note: Document link embedded in the trust page shell; not fetched.
+gaps:
+- No ISO 27001, PCI DSS, HIPAA or FedRAMP claim was found on any server-rendered Yoodli page.
+- No security.txt on any host (/.well-known/security.txt returns 404 everywhere — see well-known/yoodli-well-known.yml).
+- 'No responsible-disclosure or vulnerability-disclosure page: /responsible-disclosure, /security/responsible-disclosure
+  and /vulnerability-disclosure all 404, and hackerone.com/yoodli and bugcrowd.com/yoodli both 404. No Security
+  pointer is emitted — there is no disclosure program to point at.'

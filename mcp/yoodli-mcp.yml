@@ -1,0 +1,67 @@
+generated: '2026-09-04'
+method: probed
+source: https://developers.yoodli.ai/docs/mcp
+status: published
+deployment:
+  mode: remote
+  endpoint: https://developers.yoodli.ai/mcp
+  auth: none
+  verified: probed
+server:
+  name: yoodli-developer-portal
+  transport: http
+  url: https://developers.yoodli.ai/mcp
+  server_info_name: Yoodli Developer Portal
+  server_info_version: '2026-01-06'
+  protocol_version: '2025-06-18'
+  platform: ReadMe-hosted developer-portal MCP server (readme-deploy 5.878.0)
+x-evidence:
+  fetched: '2026-09-04'
+  initialize:
+    url: https://developers.yoodli.ai/mcp
+    http_status: 200
+    content_type: text/event-stream
+    serverInfo:
+      name: Yoodli Developer Portal
+      version: '2026-01-06'
+    protocolVersion: '2025-06-18'
+  tools_list:
+    http_status: 200
+    tool_count: 5
+    file: mcp/yoodli-mcp-tools-list.json
+note: 'Anonymous tools/list returned 200 with the full tool set and inputSchemas — no OAuth challenge. This is the
+  ReadMe developer-portal MCP server Yoodli publishes on its own docs host: the tools operate over the Yoodli OpenAPI
+  document (list/get/search endpoints, read server variables) and execute-request proxies an arbitrary HAR request,
+  so a caller still supplies their own Yoodli bearer API key for any authenticated Yoodli call. It is a documentation/spec-navigation
+  server, not a per-resource Yoodli tool set.'
+client_config:
+  mcpServers:
+    yoodli-developer-portal:
+      url: https://developers.yoodli.ai/mcp
+supported_clients:
+- Cursor
+- Windsurf
+- Claude Desktop
+tools:
+- name: list-endpoints
+  description: Lists all API paths and their HTTP methods with summaries, organized by path. Results can be passed
+    directly into 'get-endpoint'.
+  input_schema_properties: []
+- name: get-endpoint
+  description: Gets detailed information about a specific API endpoint, including security schemes and servers
+  input_schema_properties:
+  - method
+  - path
+- name: search-endpoints
+  description: Performs a deep search through paths, operations, and parameters to discover relevant API endpoints.
+    Use this tool to find specific API capabilities, required parameters, or data models based on search keywords.
+    Results can be passed directly into 'get-endpoint'.
+  input_schema_properties:
+  - pattern
+- name: execute-request
+  description: Executes an API request with a given HAR request object.
+  input_schema_properties:
+  - harRequest
+- name: get-server-variables
+  description: Gets the server variables for each server within a specific OpenAPI spec.
+  input_schema_properties: []

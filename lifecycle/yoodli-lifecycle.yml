@@ -1,0 +1,40 @@
+generated: '2026-09-04'
+method: searched
+source:
+- https://developers.yoodli.ai/changelog
+- https://yoodli.statuspage.io/
+- https://developers.yoodli.ai/docs/introduction
+versioning:
+  scheme: uri-path
+  current: v3
+  spec_version: 1.0.0
+  docs: https://developers.yoodli.ai/docs/introduction
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  note: No deprecation or sunset policy is published, and no RFC 8594 Sunset/Deprecation header is documented. Yoodli
+    does state, on the rate-limit page, that rate-limit thresholds may change with advance notice — the only forward-notice
+    commitment found anywhere on the developer portal.
+stability_statement:
+  source: https://developers.yoodli.ai/docs/introduction
+  quote: Yoodli's system has many API endpoints that are not described in this developer portal
+  note: 'Yoodli explicitly designates everything outside the published portal — including undocumented parameters
+    and response fields on documented endpoints — as internal and not to be relied on. That is the closest thing
+    to a stability contract published: the documented surface is the supported surface.'
+sla:
+  url: null
+  uptime_target: null
+  published: false
+status_page: https://yoodli.statuspage.io/
+status_page_api: https://yoodli.statuspage.io/api/v2/status.json
+status_probe:
+  fetched: '2026-09-04'
+  http_status: 200
+  indicator: none
+  description: All Systems Operational
+  page_id: 551ld6h312pm
+changelog: https://developers.yoodli.ai/changelog
+first_public_api_release: '2025-12-11'
+deprecated_operations: []

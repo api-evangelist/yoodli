@@ -1,0 +1,53 @@
+generated: '2026-09-04'
+method: searched
+source: https://developers.yoodli.ai/docs/web-embed-api
+spec_type: null
+asyncapi_published: false
+surface: browser-postMessage
+transport: HTML5 postMessage from an embedded https://app.yoodli.ai iframe to the host window
+server_webhooks:
+  published: false
+  note: 'Yoodli publishes NO server-side webhook: there is no subscription endpoint, no signing secret, no delivery/retry
+    contract and no event catalog on the developer portal. The only event surface is in-browser and only reaches
+    a page that is already hosting the Yoodli iframe, so a backend cannot be notified when a session completes —
+    it must be told by the embedding page, or poll GET /v3/speeches/{speechId}/feedback with a speechId it obtained
+    from a score_complete message.'
+envelope:
+  messageType: event identifier
+  data: event payload
+  messageId: optional
+  version: 1.0.0
+events:
+- name: score_complete
+  direction: iframe -> parent
+  description: Emitted when a user finishes a scored session.
+  payload_fields:
+  - name: score
+    type: number
+    description: 0-100
+  - name: speechId
+    type: string
+    description: Recording id — the key for GET /v3/speeches/{speechId}/feedback
+  - name: speechShareId
+    type: string
+  - name: roleplayId
+    type: string
+  - name: recordingId
+    type: string
+    description: URL
+  - name: recordingDuration
+    type: number
+    description: seconds
+  - name: completedAt
+    type: string
+    description: ISO 8601 timestamp
+- name: activity_done
+  direction: iframe -> parent
+  description: Emitted when a user exits or completes their activity.
+  payload_fields: []
+security:
+  origin_check: event.origin must equal 'https://app.yoodli.ai'
+  note: Yoodli documents the origin check and iframe sandbox attributes; there is no message signature.
+note: 'Captured as an event/webhook-family surface rather than an AsyncAPI document — Yoodli publishes no AsyncAPI.
+  Not fabricated into one: what exists is two documented postMessage event types with a stated payload shape and
+  a stated origin check.'

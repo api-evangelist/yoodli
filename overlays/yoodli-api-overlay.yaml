@@ -1,0 +1,26 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Yoodli API
+  version: 1.0.0
+extends: openapi/yoodli-api-openapi.yml
+actions:
+- target: $.info
+  update:
+    x-apievangelist-slug: yoodli
+    x-apievangelist-harvested: '2026-09-04'
+    x-apievangelist-source: https://developers.yoodli.ai/reference/get_v3-orgs-orgid-users (ReadMe ssr-props document.api.schema)
+    x-apievangelist-note: The published document declares no operationId on any operation, no 401 or 429 response
+      despite documenting both behaviours, and no top-level security block — security is repeated per operation.
+      These are observations about the provider's document, not changes to it.
+- target: $.servers
+  update:
+  - url: https://app.yoodli.ai/api
+    description: Official API server
+- target: $.info
+  update:
+    x-apievangelist-rate-limits: rate-limits/yoodli-rate-limits.yml
+    x-apievangelist-conventions: conventions/yoodli-conventions.yml
+    x-apievangelist-errors: errors/yoodli-problem-types.yml
+x-note: The servers action narrows the harvested servers[] to the production host for downstream tooling; Yoodli's
+  own document also lists http://localhost:3001/api, which it labels "(Yoodli internal use only) local server".
+  The original document under openapi/_original/ is untouched.

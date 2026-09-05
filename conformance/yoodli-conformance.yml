@@ -1,0 +1,90 @@
+generated: '2026-09-04'
+method: derived
+source:
+- openapi/yoodli-api-openapi.yml
+- https://yoodli.ai/privacy
+- https://trust.yoodli.ai/
+- https://yoodli.ai/platform/ai-integrations
+standards:
+- id: openapi-3.1
+  conforms: true
+  evidence: 'openapi: 3.1.0 in the published spec at developers.yoodli.ai'
+- id: http-bearer-auth
+  conforms: true
+  evidence: components.securitySchemes.BearerAuth type http scheme bearer, applied to all 13 operations
+- id: oauth2
+  conforms: false
+  evidence: no oauth2 securityScheme in the spec; API keys are long-lived bearer tokens minted in the admin UI
+- id: oidc
+  conforms: false
+  evidence: /.well-known/openid-configuration 404s on yoodli.ai, www.yoodli.ai and developers.yoodli.ai; app.yoodli.ai
+    returns an SPA shell for every path
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: errors use a bespoke {error, code} JSON envelope, not application/problem+json
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: /.well-known/security.txt returns 404 on every Yoodli host (see well-known/yoodli-well-known.yml)
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: no Sunset or Deprecation header documented or declared
+- id: pagination
+  conforms: true
+  evidence: offset pagination via start + limit (max 1000, default 20) on the two list operations
+- id: idempotency
+  conforms: false
+  evidence: no Idempotency-Key parameter on any of the 7 mutating operations
+- id: mcp
+  conforms: true
+  evidence: remote MCP server at https://developers.yoodli.ai/mcp answered initialize + tools/list anonymously (protocolVersion
+    2025-06-18, 5 tools)
+- id: llms-txt
+  conforms: true
+  evidence: https://developers.yoodli.ai/llms.txt served verbatim, indexing 11 guides, 13 API-reference operations
+    and 6 changelog entries
+- id: a2a-agent-card
+  conforms: false
+  evidence: /.well-known/agent-card.json and /.well-known/agent.json 404 on all hosts; app.yoodli.ai 200s are SPA
+    shells (negative control also 200)
+- id: asyncapi
+  conforms: false
+  evidence: no AsyncAPI document published; the only event surface is browser postMessage from the Web Embed iframe
+domain_standards:
+  market: workforce learning / enterprise identity provisioning
+  assessed:
+  - id: scim2
+    conforms: false
+    claim: SCIM provisioning is listed as a Team & Enterprise capability on https://yoodli.ai/pricing and https://yoodli.ai/platform/ai-integrations
+    evidence: 'The published OpenAPI declares no SCIM surface: no /scim/v2 paths, no urn:ietf:params:scim:schemas:*
+      schema URNs, no SCIM ListResponse shape. Yoodli''s own user provisioning API is a bespoke /v3/orgs/{orgId}/users
+      design. SCIM appears to be delivered through the enterprise SSO/IdP configuration rather than a documented
+      public contract, so a buyer who already speaks SCIM cannot verify it from anything Yoodli publishes.'
+  - id: lti
+    conforms: false
+    evidence: no LTI launch, deep-linking or names-and-roles surface in the spec despite an education vertical
+  - id: xapi-scorm
+    conforms: false
+    evidence: LMS integration is marketed but no xAPI (Tin Can) statement endpoint, cmi5 or SCORM package contract
+      is published; the closest published artifact is the Web Embed score_complete postMessage event
+  note: REWARD-ONLY assessment. Yoodli sells into L&D and enterprise identity, where SCIM 2.0 and xAPI are the market
+    standards, and it markets both capabilities — but neither is present in any contract it publishes. Recorded
+    as an honest false, not a penalty.
+compliance_program:
+  published: true
+  trust_center: https://trust.yoodli.ai/
+  trust_center_platform: Vanta
+  certifications_claimed:
+  - SOC 2 Type 2
+  - GDPR
+  evidence:
+  - source: https://yoodli.ai/privacy
+    http_status: 200
+    keywords:
+    - SOC2 (x4)
+    - SOC 2 Type 2
+    - GDPR
+  - source: https://trust.yoodli.ai/
+    http_status: 200
+    note: Live and linked from the Yoodli homepage, but the page is a client-rendered Vanta trust report (6,378-byte
+      shell, all content loaded from assets.vanta.com). No certification could be read from the served HTML — the
+      certification list above is taken from Yoodli's own privacy policy, which is machine-readable.

@@ -1,0 +1,53 @@
+generated: '2026-09-04'
+method: searched
+source: openapi/yoodli-api-openapi.yml
+docs: https://developers.yoodli.ai/docs/api-keys
+summary:
+  types:
+  - http
+  http_schemes:
+  - bearer
+  api_key_in: []
+  oauth2_flows: []
+  model: long-lived bearer API key minted in the Yoodli admin UI
+schemes:
+- name: BearerAuth
+  type: http
+  scheme: bearer
+  bearerFormat: null
+  sources:
+  - openapi/yoodli-api-openapi.yml
+  applied_to: all 13 published operations (declared per-operation; there is no top-level security block)
+  header: 'Authorization: Bearer <API key>'
+key_management:
+  kinds:
+  - name: Organization Management API key
+    scope: one Organization
+    created_by:
+    - Organization Administrator
+    - Organization Owner
+    path: Admin view -> Org Settings -> "Access and SSO" -> "Organization Management API" -> Manage -> Create API
+      key
+  - name: Multi Org Management API key
+    scope: a Multi Org and its member Organizations
+    created_by:
+    - Multi Org Administrator
+    path: Admin view -> Org Settings -> "Manage Multi Org" -> Settings -> "Access" -> "Multi Org Management API"
+      -> Manage -> Create API key
+  max_keys_per_entity: 3
+  expiration: 'Set at creation: an explicit expiry date, or "Never expires"'
+  shown_once: true
+  rotation: No rotation endpoint; a lost key cannot be re-displayed and must be replaced by creating a new one
+  prefix: null
+  token_id: Yoodli refers to an "API Key Token ID" in support guidance and asks for the FIRST HALF only, never the
+    full key
+  docs: https://developers.yoodli.ai/docs/api-keys
+scopes:
+  model: role-based, not scope-based
+  note: There is no OAuth surface and no scope vocabulary. Authorization is carried by which key kind was minted
+    and by the caller's admin role — 403 is returned when the caller is not an admin, and 404 is used in several
+    places to hide resources the caller cannot see. No scopes/ artifact is emitted; there is nothing to enumerate.
+gaps:
+- No 401 response is declared on any operation despite BearerAuth on all 13.
+- No token-introspection, key-listing or key-revocation API — key lifecycle is UI-only.
+- No OIDC/OAuth discovery document is served on any host (all /.well-known probes 404 or return an SPA shell).
