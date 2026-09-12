@@ -1,0 +1,14 @@
+{
+  "repo": "yoodli",
+  "feeds": [
+    {
+      "source": "https://support.yoodli.ai/",
+      "feed_url": "https://support.yoodli.ai/feed.xml",
+      "title": "",
+      "saved": 2,
+      "method": "discovered"
+    }
+  ],
+  "post_count": 2,
+  "fetched": "2026-09-06T19:17:18Z"
+}
