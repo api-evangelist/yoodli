@@ -7,6 +7,11 @@ deployment:
   endpoint: https://developers.yoodli.ai/mcp
   auth: none
   verified: probed
+  probe_prior: (never probed)
+  probe: live
+  probe_why: live
+  checked: '2026-09-11'
+  source: claimed-backlog re-probe 2026-09-11
 server:
   name: yoodli-developer-portal
   transport: http
@@ -29,11 +34,12 @@ x-evidence:
     http_status: 200
     tool_count: 5
     file: mcp/yoodli-mcp-tools-list.json
-note: 'Anonymous tools/list returned 200 with the full tool set and inputSchemas — no OAuth challenge. This is the
-  ReadMe developer-portal MCP server Yoodli publishes on its own docs host: the tools operate over the Yoodli OpenAPI
-  document (list/get/search endpoints, read server variables) and execute-request proxies an arbitrary HAR request,
-  so a caller still supplies their own Yoodli bearer API key for any authenticated Yoodli call. It is a documentation/spec-navigation
-  server, not a per-resource Yoodli tool set.'
+note: 'Anonymous tools/list returned 200 with the full tool set and inputSchemas — no OAuth challenge.
+  This is the ReadMe developer-portal MCP server Yoodli publishes on its own docs host: the tools operate
+  over the Yoodli OpenAPI document (list/get/search endpoints, read server variables) and execute-request
+  proxies an arbitrary HAR request, so a caller still supplies their own Yoodli bearer API key for any
+  authenticated Yoodli call. It is a documentation/spec-navigation server, not a per-resource Yoodli tool
+  set.'
 client_config:
   mcpServers:
     yoodli-developer-portal:
@@ -44,18 +50,19 @@ supported_clients:
 - Claude Desktop
 tools:
 - name: list-endpoints
-  description: Lists all API paths and their HTTP methods with summaries, organized by path. Results can be passed
-    directly into 'get-endpoint'.
+  description: Lists all API paths and their HTTP methods with summaries, organized by path. Results can
+    be passed directly into 'get-endpoint'.
   input_schema_properties: []
 - name: get-endpoint
-  description: Gets detailed information about a specific API endpoint, including security schemes and servers
+  description: Gets detailed information about a specific API endpoint, including security schemes and
+    servers
   input_schema_properties:
   - method
   - path
 - name: search-endpoints
-  description: Performs a deep search through paths, operations, and parameters to discover relevant API endpoints.
-    Use this tool to find specific API capabilities, required parameters, or data models based on search keywords.
-    Results can be passed directly into 'get-endpoint'.
+  description: Performs a deep search through paths, operations, and parameters to discover relevant API
+    endpoints. Use this tool to find specific API capabilities, required parameters, or data models based
+    on search keywords. Results can be passed directly into 'get-endpoint'.
   input_schema_properties:
   - pattern
 - name: execute-request
