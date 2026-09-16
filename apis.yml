@@ -20,6 +20,17 @@ created: '2026-09-04'
 modified: '2026-09-04'
 tags:
 - Artificial Intelligence
+- Communications
+- Coaching
+- Learning and Development
+- Sales Enablement
+- Speech Analysis
+- Human Resources
+- Enterprise Software
+- Software-as-a-Service
+- Identity Management
+tags_raw:
+- Artificial Intelligence
 - Communication
 - Coaching
 - Learning and Development
@@ -35,35 +46,73 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 apis:
-- aid: yoodli:yoodli-api
-  name: Yoodli API
-  description: >-
-    Yoodli's public REST API (OpenAPI 3.1.0, 13 operations) for administrative programmatic access
-    to the platform — listing, inviting and removing Organization members, creating, updating and
-    deleting User Groups, reading Organization and Multi Org details, adjusting Multi Org seat
-    allocation, setting membership expiration dates, and downloading a recording's feedback
-    (rubric goal scores, coaching feedback, reviewer comments, transcript). Bearer API-key auth;
-    three published rate-limit tiers.
+- aid: yoodli:yoodli-multi-org-management-api
+  name: Yoodli Multi Org Management API
+  description: Operations on Multi Org feature.
   humanURL: https://developers.yoodli.ai/docs/introduction
   baseURL: https://app.yoodli.ai/api
-  image: https://files.readme.io/00bff5691627b960ef3c81cd866921c2c7e950e9f964ec08eb36d59b5e1d307a-yoodli_logo_purplebg_16_9.svg
   tags:
-  - Organization User Management
-  - User Group Management
   - Multi Org Management
-  - Speech
   properties:
   - type: OpenAPI
-    url: openapi/yoodli-api-openapi.yml
+    url: openapi/yoodli-multi-org-management-api-openapi.yml
   - type: Documentation
     url: https://developers.yoodli.ai/docs/introduction
   - type: APIReference
     url: https://developers.yoodli.ai/reference/get_v3-orgs-orgid-users
   - type: GettingStarted
     url: https://developers.yoodli.ai/docs/quickstart
-  - type: Overlay
-    url: overlays/yoodli-api-overlay.yaml
+- aid: yoodli:yoodli-organization-user-management-api
+  name: Yoodli Organization User Management API
+  description: Operations on members of Organizations and their User Groups.
+  humanURL: https://developers.yoodli.ai/docs/introduction
+  baseURL: https://app.yoodli.ai/api
+  tags:
+  - Organization User Management
+  properties:
+  - type: OpenAPI
+    url: openapi/yoodli-organization-user-management-api-openapi.yml
+  - type: Documentation
+    url: https://developers.yoodli.ai/docs/introduction
+  - type: APIReference
+    url: https://developers.yoodli.ai/reference/get_v3-orgs-orgid-users
+  - type: GettingStarted
+    url: https://developers.yoodli.ai/docs/quickstart
+- aid: yoodli:yoodli-speech-api
+  name: Yoodli Speech API
+  description: Operations on recordings and their feedback exports.
+  humanURL: https://developers.yoodli.ai/docs/introduction
+  baseURL: https://app.yoodli.ai/api
+  tags:
+  - Speech
+  properties:
+  - type: OpenAPI
+    url: openapi/yoodli-speech-api-openapi.yml
+  - type: Documentation
+    url: https://developers.yoodli.ai/docs/introduction
+  - type: APIReference
+    url: https://developers.yoodli.ai/reference/get_v3-orgs-orgid-users
+  - type: GettingStarted
+    url: https://developers.yoodli.ai/docs/quickstart
+- aid: yoodli:yoodli-user-group-management-api
+  name: Yoodli User Group Management API
+  description: Operations on User Groups.
+  humanURL: https://developers.yoodli.ai/docs/introduction
+  baseURL: https://app.yoodli.ai/api
+  tags:
+  - User Group Management
+  properties:
+  - type: OpenAPI
+    url: openapi/yoodli-user-group-management-api-openapi.yml
+  - type: Documentation
+    url: https://developers.yoodli.ai/docs/introduction
+  - type: APIReference
+    url: https://developers.yoodli.ai/reference/get_v3-orgs-orgid-users
+  - type: GettingStarted
+    url: https://developers.yoodli.ai/docs/quickstart
 common:
+- type: Overlay
+  url: overlays/yoodli-api-overlay.yaml
 - type: Website
   url: https://yoodli.ai/
 - type: DeveloperPortal
