@@ -1,0 +1,26 @@
+{
+  "provider": "yoodli",
+  "sources": [
+    "_original/yoodli-api-openapi-original.json"
+  ],
+  "outputs": [
+    "yoodli-multi-org-management-api-openapi.yml",
+    "yoodli-organization-user-management-api-openapi.yml",
+    "yoodli-speech-api-openapi.yml",
+    "yoodli-user-group-management-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "yoodli-api-openapi-original.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "yoodli-multi-org-management-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "yoodli-organization-user-management-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "yoodli-speech-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "yoodli-user-group-management-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

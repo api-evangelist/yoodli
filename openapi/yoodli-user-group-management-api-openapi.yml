@@ -1,0 +1,350 @@
+openapi: 3.2.0
+info:
+  title: Yoodli API spec User Group Management API
+  version: 1.0.0
+  description: Operations on User Groups.
+servers:
+- url: https://app.yoodli.ai/api
+  description: Official API server
+- url: http://localhost:3001/api
+  description: (Yoodli internal use only) local server
+tags:
+- name: User Group Management
+  x-tag-expanded: false
+  description: Operations on User Groups.
+paths:
+  /v3/orgs/{orgId}/hubs:
+    post:
+      summary: Create a User Group
+      tags:
+      - User Group Management
+      description: 'Creates a new User Group within an Organization.
+
+
+        Rate limit category: Slow API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHubRequest'
+      responses:
+        '201':
+          description: The User Group was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HubResponseItem'
+        '400':
+          description: Invalid request body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: The Organization's User Group quota has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The Organization not found or no access to the Organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: postV3OrgsByOrgIdHubs
+      x-operation-id-source: derived
+  /v3/orgs/{orgId}/hubs/{hubId}:
+    delete:
+      summary: Delete a User Group
+      tags:
+      - User Group Management
+      description: 'Deletes a User Group from an Organization.
+
+
+        The default User Group cannot be deleted.
+
+
+        Members who belong only to the deleted User Group can either be:
+
+        - Transferred to the default User Group (when `transfer=true`)
+
+        - Removed from the Organization entirely (when `transfer=false` or omitted)
+
+
+        Rate limit category: Medium API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID.
+        schema:
+          type: string
+      - name: hubId
+        in: path
+        required: true
+        description: User Group ID. Cannot be `default` as the default User Group cannot be deleted.
+        schema:
+          type: string
+      - name: transfer
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/BooleanStringType'
+        description: "Determine whether the users who belong only to the deleted User Group are transferred\n to the default User Group or are removed from the Organization entirely.\n\nPossible values:\n- `true` – Represents a true boolean value.\n- `false` – Represents a false boolean value."
+      responses:
+        '204':
+          description: The User Group was deleted successfully.
+        '400':
+          description: Invalid query parameters or the User Group is managed by SCIM.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: The caller does not have permission to delete the User Group or attempting to delete the default User Group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The Organization or User Group not found or no access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: deleteV3OrgsByOrgIdHubsByHubId
+      x-operation-id-source: derived
+    patch:
+      summary: Update a User Group
+      tags:
+      - User Group Management
+      description: 'Updates an existing User Group within an Organization.
+
+        Currently supports updating the User Group name only.
+
+
+        Rate limit category: Medium API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID
+        schema:
+          type: string
+      - name: hubId
+        in: path
+        required: true
+        description: User Group ID. Use `default` to refer to the default User Group of the Organization.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HubUpdateRequest'
+      responses:
+        '200':
+          description: The User Group was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HubResponseItem'
+        '400':
+          description: Invalid request body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: The caller does not have permission to update the User Group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The Organization or User Group not found or no access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: patchV3OrgsByOrgIdHubsByHubId
+      x-operation-id-source: derived
+  /v3/orgs/{orgId}:
+    get:
+      summary: Get information about an Organization and its User Groups
+      tags:
+      - User Group Management
+      description: 'Get information about an Organization and its User Groups.
+
+
+        Rate limit category: Fast API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The Organization details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgResponse'
+        '404':
+          description: The Organization not found or no access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: getV3OrgsByOrgId
+      x-operation-id-source: derived
+components:
+  schemas:
+    OrgResponse:
+      type: object
+      properties:
+        id:
+          examples:
+          - aBcD2345eFgH6789iJkm
+          type: string
+          description: Organization ID.
+        name:
+          examples:
+          - Acme Corporation
+          type: string
+          description: Organization name.
+        default_hub_id:
+          examples:
+          - dE3f4gH5
+          type: string
+          description: ID of the default User Group for this Organization.
+        hubs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                examples:
+                - dE3f4gH5
+                type: string
+                description: ID of the User Group.
+              name:
+                examples:
+                - Sales Team
+                type: string
+                description: Name of the User Group.
+              org_default:
+                examples:
+                - false
+                type: boolean
+                description: Whether this User Group is the default User Group of the Organization.
+              creation_date:
+                examples:
+                - '2024-01-15T10:30:00.000Z'
+                type: string
+                description: The date and time when the User Group was created in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
+            required:
+            - id
+            - name
+            - org_default
+            - creation_date
+          description: "List of User Groups in this Organization accessible to the caller.\n API for updating an Organization does not emit this field."
+      required:
+      - id
+      - name
+      - default_hub_id
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message. This is for developers, and not for end users or translated.
+        code:
+          type: string
+          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
+      required:
+      - error
+    HubUpdateRequest:
+      type: object
+      properties:
+        name:
+          examples:
+          - Sales Team
+          - Engineering
+          type: string
+          description: New name of the User Group.
+      required:
+      - name
+    HubResponseItem:
+      type: object
+      properties:
+        id:
+          examples:
+          - dE3f4gH5
+          type: string
+          description: ID of the User Group.
+        name:
+          examples:
+          - Sales Team
+          type: string
+          description: Name of the User Group.
+        org_default:
+          examples:
+          - false
+          type: boolean
+          description: Whether this User Group is the default User Group of the Organization.
+        creation_date:
+          examples:
+          - '2024-01-15T10:30:00.000Z'
+          type: string
+          description: The date and time when the User Group was created in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
+      required:
+      - id
+      - name
+      - org_default
+      - creation_date
+    BooleanStringType:
+      type: string
+      enum:
+      - 'true'
+      - 'false'
+      description: 'Possible values:
+
+        - `true` – Represents a true boolean value.
+
+        - `false` – Represents a false boolean value.'
+    CreateHubRequest:
+      type: object
+      properties:
+        name:
+          examples:
+          - Sales Team
+          - Engineering
+          type: string
+          description: Name of the User Group to create.
+      required:
+      - name
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

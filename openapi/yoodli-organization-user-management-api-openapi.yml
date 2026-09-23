@@ -1,0 +1,960 @@
+openapi: 3.2.0
+info:
+  title: Yoodli API spec Organization User Management API
+  version: 1.0.0
+  description: Operations on members of Organizations and their User Groups.
+servers:
+- url: https://app.yoodli.ai/api
+  description: Official API server
+- url: http://localhost:3001/api
+  description: (Yoodli internal use only) local server
+tags:
+- name: Organization User Management
+  x-tag-expanded: false
+  description: Operations on members of Organizations and their User Groups.
+paths:
+  /v3/orgs/{orgId}/users:
+    post:
+      summary: Add or invite Users to an Organization and its User Groups
+      tags:
+      - Organization User Management
+      description: 'Add or invite Users, up to 20 at a time, to an Organization and its User Groups.
+
+
+        If an invited user is already a member of the Organization,
+
+        the user is added directly to the specified User Groups.
+
+
+        If an invited user is not a member of the Organization,
+
+        the user is invited to the Organization and the specified User Groups.
+
+        The user is added to the org after accepting the invite.
+
+
+        Rate limit category: Medium API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddOrgUsersRequest'
+      responses:
+        '207':
+          description: 'The request was processed. The results for individual users may be different.
+
+            Response body includes results for each requested email.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddOrgUsersResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Access denied or the resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: postV3OrgsByOrgIdUsers
+      x-operation-id-source: derived
+    get:
+      summary: List Users in an Organization
+      tags:
+      - Organization User Management
+      description: 'Returns Users in the Organization by the specified sorting order and filtering.
+
+        Several filtering, sorting, and pagination options are available.
+
+
+        Rate limit category: Fast API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID.
+        schema:
+          type: string
+      - name: effective_role
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/RTEffectiveRole'
+        style: form
+        explode: true
+        description: 'Filter to limit the roles to be listed. If not specified, everyone is listed.
+
+
+          Possible values:
+
+          - `org_owner` – Organization Owner.
+
+          - `org_admin` – Organization Administrator.
+
+          - `space_admin` – Space Administrator.
+
+          - `hub_admin` – User Group Administrator.
+
+          - `hub_member` – User Group Member.'
+      - name: sort
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/GetOrgMemberListSortOptionType'
+        description: 'Sort option. If not specified, `name` is used.
+
+
+          Possible values:
+
+          - `name` – Sort by name in ascending order.
+
+          - `-name` – Sort by name in descending order.
+
+          - `email` – Sort by email in ascending order.
+
+          - `-email` – Sort by email in descending order.
+
+          - `date_last_activity` – Sort by date last activity in ascending order.
+
+          - `-date_last_activity` – Sort by date last activity in descending order.
+
+          - `date_joined` – Sort by date joined in ascending order.
+
+          - `-date_joined` – Sort by date joined in descending order.
+
+          - `num_started_speeches` – Sort by number of started speeches in ascending order.
+
+          - `-num_started_speeches` – Sort by number of started speeches in descending order.'
+      - name: start
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Start index of the list. If not specified, 0 is used.
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: string
+        description: "Maximum number of elements in paginated response. Maximum is 1000.\n If not specified, 20 is used as the default value."
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          type: string
+        description: "Filter to users who have this prefix for sorting field.\n This currently works only when `sort` is `email` or `-email`.\n The primary usage is to search for a single user by email address."
+      - name: field
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetOrgMemberListFieldType'
+        style: form
+        explode: true
+        description: "Optional fields to output.\n Specify only when needed because additional fields increase response time.\n\nPossible values:\n- `hubs` – Include the information of the User Groups which the user belongs to."
+      responses:
+        '200':
+          description: The list of users in the Organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgMemberListResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The resource not found or no access to the resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: getV3OrgsByOrgIdUsers
+      x-operation-id-source: derived
+  /v3/orgs/{orgId}/hubs/{hubId}/users/remove:
+    post:
+      summary: Remove Users and outstanding invites from a User Group
+      tags:
+      - Organization User Management
+      description: 'Accepts up to 100 email addresses, removes the corresponding User Group memberships.
+
+
+        If users would lose access to all User Groups of the Organization,
+
+        they will be added to the fallback User Group.
+
+
+        Rate limit category: Medium API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID.
+        schema:
+          type: string
+      - name: hubId
+        in: path
+        required: true
+        description: User Group ID.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteHubUsersInvitesByEmailRequest'
+      responses:
+        '207':
+          description: Request processed. Individual email results are returned in the response body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoveHubUsersResponse'
+        '400':
+          description: Invalid request body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Access denied or the resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: postV3OrgsByOrgIdHubsByHubIdUsersRemove
+      x-operation-id-source: derived
+  /v3/orgs/{orgId}/users/remove:
+    post:
+      summary: Remove Users and outstanding invites from an Organization
+      tags:
+      - Organization User Management
+      description: 'Accepts up to 100 email addresses and removes them from the Organization
+
+        if they are members of the Organization or deletes their pending invites.
+
+
+        Rate limit category: Medium API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteOrgUsersInvitesByEmailRequest'
+      responses:
+        '207':
+          description: Request processed. Individual email results are returned in the response body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoveOrgUsersResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Access denied or the resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: postV3OrgsByOrgIdUsersRemove
+      x-operation-id-source: derived
+  /v3/orgs/{orgId}/invites:
+    get:
+      summary: List outstanding Invites for an Organization or a User Group
+      tags:
+      - Organization User Management
+      description: 'Returns outstanding invites scoped to an Organization or a User Group.
+
+        Several filtering, sorting, and pagination options are available.
+
+
+        Rate limit category: Fast API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID.
+        schema:
+          type: string
+      - name: sort
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/GetOrgInviteListSortOptionType'
+        description: "Sort option.\n If not specified, invites are sorted by email in ascending order.\n\nPossible values:\n- `email` – Sort by email in ascending order.\n- `-email` – Sort by email in descending order.\n- `date_invited` – Sort by date invited in ascending order.\n- `-date_invited` – Sort by date invited in descending order."
+      - name: start
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Start index of the list. If not specified, 0 is used.
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: string
+        description: "Maximum number of elements in paginated response.\n Maximum is 1000.\n If not specified, 20 is used as the default value."
+      - name: hub_id
+        in: query
+        required: false
+        schema:
+          type: string
+        description: User Group ID. If specified, limit the response to invites for a specific User Group.
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          type: string
+        description: "Filter invites matching a prefix for the selected sort field.\n Works only with `email` or `-email` sort options."
+      responses:
+        '200':
+          description: The list of outstanding invites for the Organization or User Group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgInviteListResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The resource not found or no access to the resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: getV3OrgsByOrgIdInvites
+      x-operation-id-source: derived
+  /v3/orgs/{orgId}/members/expiration:
+    patch:
+      summary: Set, update, or clear expiration dates on organization memberships
+      tags:
+      - Organization User Management
+      description: 'Accepts up to 100 email addresses per request. For each member, sets
+
+        or updates the membership expiration to the supplied UTC timestamp,
+
+        or clears it when `expiration_date` is `null`. Returns a per-email
+
+        result for each address.
+
+
+        Rate limit category: Medium API'
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMemberExpirationRequest'
+      responses:
+        '207':
+          description: Request processed. Individual results are returned in the response body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetMemberExpirationResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Access denied or the resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: patchV3OrgsByOrgIdMembersExpiration
+      x-operation-id-source: derived
+components:
+  schemas:
+    RemoveOrgUsersResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                examples:
+                - member@example.com
+                type: string
+                description: Email address provided in the request.
+              success:
+                examples:
+                - true
+                type: boolean
+                description: Indicates whether the membership or the invite to this user was removed.
+            required:
+            - email
+            - success
+          description: Results for each requested email address.
+      required:
+      - results
+    OrgInviteListResponse:
+      type: object
+      properties:
+        invites:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                examples:
+                - user@example.com
+                type: string
+                description: Email address of the invited user.
+              name:
+                examples:
+                - Jordan Lee
+                - null
+                oneOf:
+                - type: string
+                - type: 'null'
+                description: Display name provided for the invite. This is `null` if no name is provided.
+              role:
+                examples:
+                - org_admin
+                - null
+                oneOf:
+                - $ref: '#/components/schemas/RTOrgRole'
+                - type: 'null'
+                description: Organization-level role that the user will have if the invite is accepted.
+              effective_role:
+                type: string
+                enum:
+                - org_owner
+                - org_admin
+                - space_admin
+                - hub_admin
+                - hub_member
+                description: "Effective role which is the highest role that the user will have\n in the Organization by accepting this invite.\n `hub_member` is a typical end user who joins one or more User Groups\n and does not have any level of administrative privileges anywhere.\n\nPossible values:\n- `org_owner` – Organization Owner.\n- `org_admin` – Organization Administrator.\n- `space_admin` – Space Administrator.\n- `hub_admin` – User Group Administrator.\n- `hub_member` – User Group Member."
+                examples:
+                - hub_member
+              date_invited:
+                examples:
+                - '2024-10-24T04:18:12.345Z'
+                type: string
+                description: The date and time when the invite was last updated or sent in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
+              hubs:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    hub_id:
+                      examples:
+                      - adahbAHKD87
+                      type: string
+                      description: User Group ID.
+                    role:
+                      type: string
+                      enum:
+                      - hub_admin
+                      - hub_member
+                      description: Role that the user will have in the User Group.
+                      examples:
+                      - hub_member
+                  required:
+                  - hub_id
+                  - role
+                description: User Groups and corresponding roles that the user will have if the invite is accepted.
+              expiration_date:
+                examples:
+                - '2024-10-24T04:18:12.345Z'
+                - null
+                oneOf:
+                - type: string
+                - type: 'null'
+                description: "UTC ISO 8601 timestamp for when the accepted membership will\n expire, or `null` when no end date is stamped on the invite.\n Mirrors `OrgMemberResponse.expiration_date` so the frontend can\n treat invite rows and member rows identically."
+            required:
+            - email
+            - name
+            - role
+            - effective_role
+            - date_invited
+            - hubs
+            - expiration_date
+          description: List of outstanding invites for the Organization or User Group.
+        next:
+          examples:
+          - true
+          type: boolean
+          description: Whether there are more invites to list.
+        total:
+          examples:
+          - 105
+          type: number
+          description: Total number of invites for the current list.
+      required:
+      - invites
+      - next
+      - total
+    DeleteHubUsersInvitesByEmailRequest:
+      type: object
+      properties:
+        user_emails:
+          type: array
+          items:
+            type: string
+          description: Email addresses of the users to remove. At least one email must be specified.
+        fallback_hub_id:
+          examples:
+          - default
+          - daoeuj32Jqk
+          type: string
+          description: "User Group ID of the fallback.\n If any users who would otherwise lose access to all User Groups of the Organization,\n they will be added to this User Group.\n If the value is \"default\", the default User Group for the Organization will be used."
+      required:
+      - user_emails
+      - fallback_hub_id
+    OrgMemberListResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                examples:
+                - aBcD2345eFgH6789iJkm
+                type: string
+                description: ID of the user
+              name:
+                examples:
+                - John Smith
+                type: string
+                description: Display name of the user
+              email:
+                examples:
+                - john@example.com
+                type: string
+                description: Email of the user
+              role:
+                examples:
+                - org_owner
+                oneOf:
+                - $ref: '#/components/schemas/RTOrgRole'
+                - type: 'null'
+                description: Role of the user in the Organization. This is `null` if the user is not an Organization owner or an Organization admin.
+              effective_role:
+                examples:
+                - org_owner
+                oneOf:
+                - $ref: '#/components/schemas/RTEffectiveRole'
+                - type: 'null'
+                description: Effective role of the user in the Organization, which is the highest role which the user has in the Organization and any User Groups in the Organization.
+              date_last_activity:
+                examples:
+                - '2025-01-01T00:00:00.000Z'
+                oneOf:
+                - type: string
+                - type: 'null'
+                description: Date and time when the user was last active in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
+              date_joined:
+                examples:
+                - '2025-01-01T00:00:00.000Z'
+                type: string
+                description: Date and time when the user joined the Organization in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
+              num_started_speeches:
+                examples:
+                - 10
+                type: number
+                description: Number of speeches which the user has started.
+              hubs:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    hub_id:
+                      examples:
+                      - dE3f
+                      type: string
+                      description: ID of the User Group
+                    name:
+                      examples:
+                      - Use group 4
+                      type: string
+                      description: Name of the User Group
+                    role:
+                      type: string
+                      enum:
+                      - hub_admin
+                      - hub_member
+                      description: 'Role of the user in the User Group
+
+
+                        Possible values:
+
+                        - `hub_admin` – User Group Administrator.
+
+                        - `hub_member` – User Group Member.'
+                      examples:
+                      - hub_admin
+                    date_joined:
+                      examples:
+                      - '2023-02-23T05:20:35.678Z'
+                      type: string
+                      description: The date and time when the user joined the User Group in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
+                  required:
+                  - hub_id
+                  - name
+                  - role
+                  - date_joined
+                description: "User Groups which this user belongs to\n This becomes empty array if this field is not requested."
+              expiration_date:
+                examples:
+                - '2026-05-16T04:59:59.999Z'
+                oneOf:
+                - type: string
+                - type: 'null'
+                description: UTC timestamp when the user's membership expires, or `null` if no expiration is set.
+            required:
+            - user_id
+            - name
+            - email
+            - role
+            - effective_role
+            - date_last_activity
+            - date_joined
+            - num_started_speeches
+            - hubs
+            - expiration_date
+          description: List of the users in the Organization.
+        next:
+          examples:
+          - true
+          type: boolean
+          description: Whether there are more users to list.
+        total:
+          examples:
+          - 230
+          type: number
+          description: Total number of users for the current list.
+      required:
+      - users
+      - next
+      - total
+    AddOrgUsersResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                examples:
+                - mary@example.com
+                type: string
+                description: Email address of a target user.
+              result:
+                type: string
+                enum:
+                - added
+                - invite_without_email
+                - invite_with_email
+                - no_change
+                - no_more_license
+                - rejected
+                - invalid_expiration_date
+                - internal_error
+                description: "The result of the operation for this user.\n\nPossible values:\n- `added` – The user was added to the specified Organization and User Groups with the requested role.\n- `invite_without_email` – The user was invited to the specified Organization and User Groups without sending email.\n- `invite_with_email` – The user was invited to the specified Organization and User Groups with the requested role.\n An invitation email was sent to the user.\n- `no_change` – The user is already satisfied the request. No changes were applied.\n- `no_more_license` – The Organization does not have enough licenses to add or invite this user.\n- `rejected` – The request was rejected. This typically happens when attempting to downgrade an existing role.\n- `invalid_expiration_date` – The supplied `expiration_date` is at or before the current time\n (or is not a valid UTC ISO 8601 timestamp). The user was NOT\n added or invited; no email was sent and no seat was consumed.\n- `internal_error` – An internal server error occurred after the request was accepted."
+            required:
+            - email
+            - result
+          description: Results for each target user.
+      required:
+      - results
+    DeleteOrgUsersInvitesByEmailRequest:
+      type: object
+      properties:
+        user_emails:
+          type: array
+          items:
+            type: string
+          description: "Email addresses of the users to remove.\n At least one email must be specified."
+      required:
+      - user_emails
+    RTEffectiveRole:
+      type: string
+      enum:
+      - org_owner
+      - org_admin
+      - space_admin
+      - hub_admin
+      - hub_member
+      description: 'Possible values:
+
+        - `org_owner` – Organization Owner.
+
+        - `org_admin` – Organization Administrator.
+
+        - `space_admin` – Space Administrator.
+
+        - `hub_admin` – User Group Administrator.
+
+        - `hub_member` – User Group Member.'
+    UpdateMemberExpirationRequest:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+          description: "Email addresses of the members whose expiration date should be\n set or cleared."
+        expiration_date:
+          examples:
+          - '2026-06-21T00:00:00.000Z'
+          oneOf:
+          - type: string
+          - type: 'null'
+          description: "The date and time when the memberships should expire in\n `YYYY-MM-DDTHH:mm:ss.sssZ` format, or `null` to clear the expiration."
+      required:
+      - emails
+      - expiration_date
+    AddOrgUsersRequest:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+          description: "Email addresses of the users to add or invite.\n At least one email must be specified."
+        org_role:
+          examples:
+          - null
+          oneOf:
+          - $ref: '#/components/schemas/RTOrgRole'
+          - type: 'null'
+          description: "Pass `null`.\n Other values are reserved for Yoodli internal usage and future compatibility is not guaranteed."
+        hub_role:
+          examples:
+          - hub_member
+          oneOf:
+          - $ref: '#/components/schemas/RTHubRole'
+          - type: 'null'
+          description: "Pass `hub_member`.\n Other values are reserved for Yoodli internal usage and future compatibility is not guaranteed."
+        hub_ids:
+          type: array
+          items:
+            type: string
+          description: "User Group IDs to add or invite users to.\n Use `default` to refer to the Organization's default User Group."
+        send_invite_email:
+          examples:
+          - true
+          type: boolean
+          description: Specify whether invitation emails are sent to the invited users.
+        welcome_message:
+          examples:
+          - Welcome to the cohort!
+          type: string
+          description: "Optional welcome message included in invitation emails.\n HTML tags are stripped."
+        expiration_date:
+          examples:
+          - '2026-06-21T00:00:00.000Z'
+          type: string
+          description: "The date and time when the invited members' org membership should expire\n in `YYYY-MM-DDTHH:mm:ss.sssZ` format. Omit for no expiration."
+      required:
+      - emails
+      - org_role
+      - hub_role
+      - hub_ids
+      - send_invite_email
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message. This is for developers, and not for end users or translated.
+        code:
+          type: string
+          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
+      required:
+      - error
+    GetOrgMemberListSortOptionType:
+      type: string
+      enum:
+      - name
+      - -name
+      - email
+      - -email
+      - date_last_activity
+      - -date_last_activity
+      - date_joined
+      - -date_joined
+      - num_started_speeches
+      - -num_started_speeches
+      description: 'Possible values:
+
+        - `name` – Sort by name in ascending order.
+
+        - `-name` – Sort by name in descending order.
+
+        - `email` – Sort by email in ascending order.
+
+        - `-email` – Sort by email in descending order.
+
+        - `date_last_activity` – Sort by date last activity in ascending order.
+
+        - `-date_last_activity` – Sort by date last activity in descending order.
+
+        - `date_joined` – Sort by date joined in ascending order.
+
+        - `-date_joined` – Sort by date joined in descending order.
+
+        - `num_started_speeches` – Sort by number of started speeches in ascending order.
+
+        - `-num_started_speeches` – Sort by number of started speeches in descending order.'
+    RTOrgRole:
+      type: string
+      enum:
+      - org_owner
+      - org_admin
+      description: 'Possible values:
+
+        - `org_owner` – Organization Owner.
+
+        - `org_admin` – Organization Administrator.'
+    SetMemberExpirationResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                examples:
+                - user@example.com
+                type: string
+                description: Email address this result applies to.
+              status:
+                type: string
+                enum:
+                - success
+                - invalid_email
+                - not_found
+                - owner_cannot_expire
+                - scim_managed
+                - invalid_date
+                - internal_error
+                description: "The result of the operation for this member.\n\nPossible values:\n- `success` – Expiration was set, updated, or cleared successfully.\n- `invalid_email` – The request email could not be parsed as a valid email address.\n- `not_found` – No membership found for this email in the organization.\n- `owner_cannot_expire` – Target user is the org owner — expiration cannot be set on owners.\n- `scim_managed` – Target user is managed by SCIM — expiration must be removed\n before SCIM can manage.\n- `invalid_date` – The computed UTC expiration date is in the past.\n- `internal_error` – An unexpected error occurred while processing this user."
+            required:
+            - email
+            - status
+          description: Individual results for each requested email.
+      required:
+      - results
+    RTHubRole:
+      type: string
+      enum:
+      - hub_admin
+      - hub_member
+      description: 'Possible values:
+
+        - `hub_admin` – User Group Administrator.
+
+        - `hub_member` – User Group Member.'
+    RemoveHubUsersResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                examples:
+                - member@example.com
+                type: string
+                description: Email address provided in the original request.
+              success:
+                examples:
+                - true
+                type: boolean
+                description: Indicates whether the membership or invite to this user was removed.
+            required:
+            - email
+            - success
+          description: Individual removal results for each requested email.
+      required:
+      - results
+    GetOrgMemberListFieldType:
+      type: string
+      enum:
+      - hubs
+      description: 'Possible values:
+
+        - `hubs` – Include the information of the User Groups which the user belongs to.'
+    GetOrgInviteListSortOptionType:
+      type: string
+      enum:
+      - email
+      - -email
+      - date_invited
+      - -date_invited
+      description: 'Possible values:
+
+        - `email` – Sort by email in ascending order.
+
+        - `-email` – Sort by email in descending order.
+
+        - `date_invited` – Sort by date invited in ascending order.
+
+        - `-date_invited` – Sort by date invited in descending order.'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

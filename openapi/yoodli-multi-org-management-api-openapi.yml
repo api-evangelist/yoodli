@@ -1,0 +1,273 @@
+openapi: 3.2.0
+info:
+  title: Yoodli API spec Multi Org Management API
+  version: 1.0.0
+  description: Operations on Multi Org feature.
+servers:
+- url: https://app.yoodli.ai/api
+  description: Official API server
+- url: http://localhost:3001/api
+  description: (Yoodli internal use only) local server
+tags:
+- name: Multi Org Management
+  x-tag-expanded: false
+  description: Operations on Multi Org feature.
+paths:
+  /v3/enterprises/{enterpriseId}:
+    get:
+      summary: Get Multi Org details
+      tags:
+      - Multi Org Management
+      description: 'Retrieves detailed information about a Multi Org including administrators,
+
+        member Organizations, and seat pool usage statistics.
+
+
+        Rate limit category: Fast API'
+      parameters:
+      - name: enterpriseId
+        in: path
+        required: true
+        description: Multi Org ID.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Multi Org details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEnterpriseResponse'
+        '403':
+          description: Permission denied. The caller is not an administrator of this Multi Org.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Multi Org not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: getV3EnterprisesByEnterpriseId
+      x-operation-id-source: derived
+  /v3/enterprises/{enterpriseId}/orgs/{orgId}:
+    patch:
+      summary: Update settings of an Organization in a Multi Org
+      tags:
+      - Multi Org Management
+      description: 'Updates seat allocation of an Organization within a Multi Org.
+
+
+        Rate limit category: Medium API'
+      parameters:
+      - name: enterpriseId
+        in: path
+        required: true
+        description: Multi Org ID.
+        schema:
+          type: string
+      - name: orgId
+        in: path
+        required: true
+        description: Organization ID.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEnterpriseOrgRequest'
+      responses:
+        '200':
+          description: Organization updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEnterpriseOrgResponse'
+        '400':
+          description: Invalid request body or seat allocation exceeds Multi Org limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permission denied or Organization does not belong to this Multi Org.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Multi Org or Organization not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Seat allocation is less than current usage.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - BearerAuth: []
+      operationId: patchV3EnterprisesByEnterpriseIdOrgsByOrgId
+      x-operation-id-source: derived
+components:
+  schemas:
+    UpdateEnterpriseOrgResponse:
+      type: object
+      properties:
+        success:
+          examples:
+          - true
+          type: boolean
+          description: Whether the operation completed successfully.
+      required:
+      - success
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message. This is for developers, and not for end users or translated.
+        code:
+          type: string
+          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
+      required:
+      - error
+    GetEnterpriseResponse:
+      type: object
+      properties:
+        id:
+          examples:
+          - aBcD2345eFgH6789iJkm
+          type: string
+          description: ID of the Multi Org.
+        name:
+          examples:
+          - Acme Enterprise
+          type: string
+          description: Name of the Multi Org.
+        seat_pool_total:
+          examples:
+          - 500
+          type: number
+          description: Total number of seats in the Multi Org seat pool.
+        seat_pool_allocated:
+          examples:
+          - 400
+          type: number
+          description: Number of seats currently allocated from the Multi Org seat pool across all member Organizations.
+        seat_pool_used:
+          examples:
+          - 350
+          type: number
+          description: Number of seats currently in use across all member Organizations.
+        admins:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                examples:
+                - aBcD2345eFgH6789iJkm
+                type: string
+                description: User ID.
+              name:
+                examples:
+                - Jordan Lee
+                type: string
+                description: Display name of the user.
+              email:
+                examples:
+                - admin@example.com
+                type: string
+                description: Email of the user.
+            required:
+            - user_id
+            - name
+            - email
+          description: List of administrator users for the Multi Org.
+        member_orgs:
+          type: array
+          items:
+            type: object
+            properties:
+              org_id:
+                examples:
+                - aBcD2345eFgH6789iJkm
+                type: string
+                description: Organization ID.
+              org_name:
+                examples:
+                - Acme Corp
+                type: string
+                description: Name of the Organization.
+              seats_allocated:
+                examples:
+                - 50
+                type: number
+                description: Number of seats allocated to this Organization from the Multi Org seat pool.
+              seats_used:
+                examples:
+                - 35
+                type: number
+                description: Number of seats currently in use by this Organization.
+              member_count:
+                examples:
+                - 40
+                type: number
+                description: Total number of members in the Organization.
+              pending_invite_count:
+                examples:
+                - 5
+                type: number
+                description: Number of pending invites to the Organization.
+              created_date:
+                examples:
+                - '2024-01-15T10:30:00.000Z'
+                type: string
+                description: Date when the Organization was created in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
+            required:
+            - org_id
+            - org_name
+            - seats_allocated
+            - seats_used
+            - member_count
+            - pending_invite_count
+            - created_date
+          description: List of member Organizations and their seat usage details.
+        home_org_id:
+          examples:
+          - aBcD2345eFgH6789iJkm
+          - null
+          oneOf:
+          - type: string
+          - type: 'null'
+          description: ID of the home org for global content broadcast. Null if not configured.
+      required:
+      - id
+      - name
+      - seat_pool_total
+      - seat_pool_allocated
+      - seat_pool_used
+      - admins
+      - member_orgs
+      - home_org_id
+    UpdateEnterpriseOrgRequest:
+      type: object
+      properties:
+        seats_allocated:
+          examples:
+          - 50
+          type: number
+          description: "New number of seats to allocate to the Organization from the Multi Org seat pool.\n Must be a non-negative integer and cannot be less than the current seat usage."
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
