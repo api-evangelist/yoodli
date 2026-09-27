@@ -220,6 +220,56 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    CreateHubRequest:
+      type: object
+      properties:
+        name:
+          examples:
+          - Sales Team
+          - Engineering
+          type: string
+          description: Name of the User Group to create.
+      required:
+      - name
+    HubResponseItem:
+      type: object
+      properties:
+        id:
+          examples:
+          - dE3f4gH5
+          type: string
+          description: ID of the User Group.
+        name:
+          examples:
+          - Sales Team
+          type: string
+          description: Name of the User Group.
+        org_default:
+          examples:
+          - false
+          type: boolean
+          description: Whether this User Group is the default User Group of the Organization.
+        creation_date:
+          examples:
+          - '2024-01-15T10:30:00.000Z'
+          type: string
+          description: The date and time when the User Group was created in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
+      required:
+      - id
+      - name
+      - org_default
+      - creation_date
+    HubUpdateRequest:
+      type: object
+      properties:
+        name:
+          examples:
+          - Sales Team
+          - Engineering
+          type: string
+          description: New name of the User Group.
+      required:
+      - name
     OrgResponse:
       type: object
       properties:
@@ -284,45 +334,6 @@ components:
           description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
       required:
       - error
-    HubUpdateRequest:
-      type: object
-      properties:
-        name:
-          examples:
-          - Sales Team
-          - Engineering
-          type: string
-          description: New name of the User Group.
-      required:
-      - name
-    HubResponseItem:
-      type: object
-      properties:
-        id:
-          examples:
-          - dE3f4gH5
-          type: string
-          description: ID of the User Group.
-        name:
-          examples:
-          - Sales Team
-          type: string
-          description: Name of the User Group.
-        org_default:
-          examples:
-          - false
-          type: boolean
-          description: Whether this User Group is the default User Group of the Organization.
-        creation_date:
-          examples:
-          - '2024-01-15T10:30:00.000Z'
-          type: string
-          description: The date and time when the User Group was created in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
-      required:
-      - id
-      - name
-      - org_default
-      - creation_date
     BooleanStringType:
       type: string
       enum:
@@ -333,17 +344,6 @@ components:
         - `true` – Represents a true boolean value.
 
         - `false` – Represents a false boolean value.'
-    CreateHubRequest:
-      type: object
-      properties:
-        name:
-          examples:
-          - Sales Team
-          - Engineering
-          type: string
-          description: Name of the User Group to create.
-      required:
-      - name
   securitySchemes:
     BearerAuth:
       type: http

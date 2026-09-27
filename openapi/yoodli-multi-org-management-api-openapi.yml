@@ -119,27 +119,14 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    UpdateEnterpriseOrgResponse:
+    UpdateEnterpriseOrgRequest:
       type: object
       properties:
-        success:
+        seats_allocated:
           examples:
-          - true
-          type: boolean
-          description: Whether the operation completed successfully.
-      required:
-      - success
-    ErrorResponse:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error message. This is for developers, and not for end users or translated.
-        code:
-          type: string
-          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
-      required:
-      - error
+          - 50
+          type: number
+          description: "New number of seats to allocate to the Organization from the Multi Org seat pool.\n Must be a non-negative integer and cannot be less than the current seat usage."
     GetEnterpriseResponse:
       type: object
       properties:
@@ -259,14 +246,27 @@ components:
       - admins
       - member_orgs
       - home_org_id
-    UpdateEnterpriseOrgRequest:
+    ErrorResponse:
       type: object
       properties:
-        seats_allocated:
+        error:
+          type: string
+          description: Error message. This is for developers, and not for end users or translated.
+        code:
+          type: string
+          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
+      required:
+      - error
+    UpdateEnterpriseOrgResponse:
+      type: object
+      properties:
+        success:
           examples:
-          - 50
-          type: number
-          description: "New number of seats to allocate to the Organization from the Multi Org seat pool.\n Must be a non-negative integer and cannot be less than the current seat usage."
+          - true
+          type: boolean
+          description: Whether the operation completed successfully.
+      required:
+      - success
   securitySchemes:
     BearerAuth:
       type: http

@@ -72,17 +72,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    ErrorResponse:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error message. This is for developers, and not for end users or translated.
-        code:
-          type: string
-          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
-      required:
-      - error
     FeedbackJsonResponse:
       type: object
       properties:
@@ -373,6 +362,17 @@ components:
       - speakers
       - coaching_feedback_hidden
       - coaching_feedback_override_message
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message. This is for developers, and not for end users or translated.
+        code:
+          type: string
+          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
+      required:
+      - error
     RTFeedbackExportSection:
       type: string
       enum:
