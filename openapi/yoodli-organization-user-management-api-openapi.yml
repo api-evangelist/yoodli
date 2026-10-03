@@ -449,6 +449,301 @@ components:
           description: Individual results for each requested email.
       required:
       - results
+    RTOrgRole:
+      type: string
+      enum:
+      - org_owner
+      - org_admin
+      description: 'Possible values:
+
+        - `org_owner` – Organization Owner.
+
+        - `org_admin` – Organization Administrator.'
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message. This is for developers, and not for end users or translated.
+        code:
+          type: string
+          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
+      required:
+      - error
+    RTHubRole:
+      type: string
+      enum:
+      - hub_admin
+      - hub_member
+      description: 'Possible values:
+
+        - `hub_admin` – User Group Administrator.
+
+        - `hub_member` – User Group Member.'
+    RTEffectiveRole:
+      type: string
+      enum:
+      - org_owner
+      - org_admin
+      - space_admin
+      - hub_admin
+      - hub_member
+      description: 'Possible values:
+
+        - `org_owner` – Organization Owner.
+
+        - `org_admin` – Organization Administrator.
+
+        - `space_admin` – Space Administrator.
+
+        - `hub_admin` – User Group Administrator.
+
+        - `hub_member` – User Group Member.'
+    GetOrgInviteListSortOptionType:
+      type: string
+      enum:
+      - email
+      - -email
+      - date_invited
+      - -date_invited
+      description: 'Possible values:
+
+        - `email` – Sort by email in ascending order.
+
+        - `-email` – Sort by email in descending order.
+
+        - `date_invited` – Sort by date invited in ascending order.
+
+        - `-date_invited` – Sort by date invited in descending order.'
+    AddOrgUsersResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                examples:
+                - mary@example.com
+                type: string
+                description: Email address of a target user.
+              result:
+                type: string
+                enum:
+                - added
+                - invite_without_email
+                - invite_with_email
+                - no_change
+                - no_more_license
+                - rejected
+                - invalid_expiration_date
+                - internal_error
+                description: "The result of the operation for this user.\n\nPossible values:\n- `added` – The user was added to the specified Organization and User Groups with the requested role.\n- `invite_without_email` – The user was invited to the specified Organization and User Groups without sending email.\n- `invite_with_email` – The user was invited to the specified Organization and User Groups with the requested role.\n An invitation email was sent to the user.\n- `no_change` – The user is already satisfied the request. No changes were applied.\n- `no_more_license` – The Organization does not have enough licenses to add or invite this user.\n- `rejected` – The request was rejected. This typically happens when attempting to downgrade an existing role.\n- `invalid_expiration_date` – The supplied `expiration_date` is at or before the current time\n (or is not a valid UTC ISO 8601 timestamp). The user was NOT\n added or invited; no email was sent and no seat was consumed.\n- `internal_error` – An internal server error occurred after the request was accepted."
+            required:
+            - email
+            - result
+          description: Results for each target user.
+      required:
+      - results
+    DeleteOrgUsersInvitesByEmailRequest:
+      type: object
+      properties:
+        user_emails:
+          type: array
+          items:
+            type: string
+          description: "Email addresses of the users to remove.\n At least one email must be specified."
+      required:
+      - user_emails
+    DeleteHubUsersInvitesByEmailRequest:
+      type: object
+      properties:
+        user_emails:
+          type: array
+          items:
+            type: string
+          description: Email addresses of the users to remove. At least one email must be specified.
+        fallback_hub_id:
+          examples:
+          - default
+          - daoeuj32Jqk
+          type: string
+          description: "User Group ID of the fallback.\n If any users who would otherwise lose access to all User Groups of the Organization,\n they will be added to this User Group.\n If the value is \"default\", the default User Group for the Organization will be used."
+      required:
+      - user_emails
+      - fallback_hub_id
+    UpdateMemberExpirationRequest:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+          description: "Email addresses of the members whose expiration date should be\n set or cleared."
+        expiration_date:
+          examples:
+          - '2026-06-21T00:00:00.000Z'
+          oneOf:
+          - type: string
+          - type: 'null'
+          description: "The date and time when the memberships should expire in\n `YYYY-MM-DDTHH:mm:ss.sssZ` format, or `null` to clear the expiration."
+      required:
+      - emails
+      - expiration_date
+    RemoveHubUsersResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                examples:
+                - member@example.com
+                type: string
+                description: Email address provided in the original request.
+              success:
+                examples:
+                - true
+                type: boolean
+                description: Indicates whether the membership or invite to this user was removed.
+            required:
+            - email
+            - success
+          description: Individual removal results for each requested email.
+      required:
+      - results
+    GetOrgMemberListFieldType:
+      type: string
+      enum:
+      - hubs
+      description: 'Possible values:
+
+        - `hubs` – Include the information of the User Groups which the user belongs to.'
+    OrgInviteListResponse:
+      type: object
+      properties:
+        invites:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                examples:
+                - user@example.com
+                type: string
+                description: Email address of the invited user.
+              name:
+                examples:
+                - Jordan Lee
+                - null
+                oneOf:
+                - type: string
+                - type: 'null'
+                description: Display name provided for the invite. This is `null` if no name is provided.
+              role:
+                examples:
+                - org_admin
+                - null
+                oneOf:
+                - $ref: '#/components/schemas/RTOrgRole'
+                - type: 'null'
+                description: Organization-level role that the user will have if the invite is accepted.
+              effective_role:
+                type: string
+                enum:
+                - org_owner
+                - org_admin
+                - space_admin
+                - hub_admin
+                - hub_member
+                description: "Effective role which is the highest role that the user will have\n in the Organization by accepting this invite.\n `hub_member` is a typical end user who joins one or more User Groups\n and does not have any level of administrative privileges anywhere.\n\nPossible values:\n- `org_owner` – Organization Owner.\n- `org_admin` – Organization Administrator.\n- `space_admin` – Space Administrator.\n- `hub_admin` – User Group Administrator.\n- `hub_member` – User Group Member."
+                examples:
+                - hub_member
+              date_invited:
+                examples:
+                - '2024-10-24T04:18:12.345Z'
+                type: string
+                description: The date and time when the invite was last updated or sent in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
+              hubs:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    hub_id:
+                      examples:
+                      - adahbAHKD87
+                      type: string
+                      description: User Group ID.
+                    role:
+                      type: string
+                      enum:
+                      - hub_admin
+                      - hub_member
+                      description: Role that the user will have in the User Group.
+                      examples:
+                      - hub_member
+                  required:
+                  - hub_id
+                  - role
+                description: User Groups and corresponding roles that the user will have if the invite is accepted.
+              expiration_date:
+                examples:
+                - '2024-10-24T04:18:12.345Z'
+                - null
+                oneOf:
+                - type: string
+                - type: 'null'
+                description: "UTC ISO 8601 timestamp for when the accepted membership will\n expire, or `null` when no end date is stamped on the invite.\n Mirrors `OrgMemberResponse.expiration_date` so the frontend can\n treat invite rows and member rows identically."
+            required:
+            - email
+            - name
+            - role
+            - effective_role
+            - date_invited
+            - hubs
+            - expiration_date
+          description: List of outstanding invites for the Organization or User Group.
+        next:
+          examples:
+          - true
+          type: boolean
+          description: Whether there are more invites to list.
+        total:
+          examples:
+          - 105
+          type: number
+          description: Total number of invites for the current list.
+      required:
+      - invites
+      - next
+      - total
+    RemoveOrgUsersResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                examples:
+                - member@example.com
+                type: string
+                description: Email address provided in the request.
+              success:
+                examples:
+                - true
+                type: boolean
+                description: Indicates whether the membership or the invite to this user was removed.
+            required:
+            - email
+            - success
+          description: Results for each requested email address.
+      required:
+      - results
     AddOrgUsersRequest:
       type: object
       properties:
@@ -531,203 +826,6 @@ components:
         - `num_started_speeches` – Sort by number of started speeches in ascending order.
 
         - `-num_started_speeches` – Sort by number of started speeches in descending order.'
-    RemoveHubUsersResponse:
-      type: object
-      properties:
-        results:
-          type: array
-          items:
-            type: object
-            properties:
-              email:
-                examples:
-                - member@example.com
-                type: string
-                description: Email address provided in the original request.
-              success:
-                examples:
-                - true
-                type: boolean
-                description: Indicates whether the membership or invite to this user was removed.
-            required:
-            - email
-            - success
-          description: Individual removal results for each requested email.
-      required:
-      - results
-    DeleteOrgUsersInvitesByEmailRequest:
-      type: object
-      properties:
-        user_emails:
-          type: array
-          items:
-            type: string
-          description: "Email addresses of the users to remove.\n At least one email must be specified."
-      required:
-      - user_emails
-    RTHubRole:
-      type: string
-      enum:
-      - hub_admin
-      - hub_member
-      description: 'Possible values:
-
-        - `hub_admin` – User Group Administrator.
-
-        - `hub_member` – User Group Member.'
-    RTOrgRole:
-      type: string
-      enum:
-      - org_owner
-      - org_admin
-      description: 'Possible values:
-
-        - `org_owner` – Organization Owner.
-
-        - `org_admin` – Organization Administrator.'
-    RemoveOrgUsersResponse:
-      type: object
-      properties:
-        results:
-          type: array
-          items:
-            type: object
-            properties:
-              email:
-                examples:
-                - member@example.com
-                type: string
-                description: Email address provided in the request.
-              success:
-                examples:
-                - true
-                type: boolean
-                description: Indicates whether the membership or the invite to this user was removed.
-            required:
-            - email
-            - success
-          description: Results for each requested email address.
-      required:
-      - results
-    GetOrgMemberListFieldType:
-      type: string
-      enum:
-      - hubs
-      description: 'Possible values:
-
-        - `hubs` – Include the information of the User Groups which the user belongs to.'
-    GetOrgInviteListSortOptionType:
-      type: string
-      enum:
-      - email
-      - -email
-      - date_invited
-      - -date_invited
-      description: 'Possible values:
-
-        - `email` – Sort by email in ascending order.
-
-        - `-email` – Sort by email in descending order.
-
-        - `date_invited` – Sort by date invited in ascending order.
-
-        - `-date_invited` – Sort by date invited in descending order.'
-    ErrorResponse:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error message. This is for developers, and not for end users or translated.
-        code:
-          type: string
-          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
-      required:
-      - error
-    RTEffectiveRole:
-      type: string
-      enum:
-      - org_owner
-      - org_admin
-      - space_admin
-      - hub_admin
-      - hub_member
-      description: 'Possible values:
-
-        - `org_owner` – Organization Owner.
-
-        - `org_admin` – Organization Administrator.
-
-        - `space_admin` – Space Administrator.
-
-        - `hub_admin` – User Group Administrator.
-
-        - `hub_member` – User Group Member.'
-    UpdateMemberExpirationRequest:
-      type: object
-      properties:
-        emails:
-          type: array
-          items:
-            type: string
-          description: "Email addresses of the members whose expiration date should be\n set or cleared."
-        expiration_date:
-          examples:
-          - '2026-06-21T00:00:00.000Z'
-          oneOf:
-          - type: string
-          - type: 'null'
-          description: "The date and time when the memberships should expire in\n `YYYY-MM-DDTHH:mm:ss.sssZ` format, or `null` to clear the expiration."
-      required:
-      - emails
-      - expiration_date
-    DeleteHubUsersInvitesByEmailRequest:
-      type: object
-      properties:
-        user_emails:
-          type: array
-          items:
-            type: string
-          description: Email addresses of the users to remove. At least one email must be specified.
-        fallback_hub_id:
-          examples:
-          - default
-          - daoeuj32Jqk
-          type: string
-          description: "User Group ID of the fallback.\n If any users who would otherwise lose access to all User Groups of the Organization,\n they will be added to this User Group.\n If the value is \"default\", the default User Group for the Organization will be used."
-      required:
-      - user_emails
-      - fallback_hub_id
-    AddOrgUsersResponse:
-      type: object
-      properties:
-        results:
-          type: array
-          items:
-            type: object
-            properties:
-              email:
-                examples:
-                - mary@example.com
-                type: string
-                description: Email address of a target user.
-              result:
-                type: string
-                enum:
-                - added
-                - invite_without_email
-                - invite_with_email
-                - no_change
-                - no_more_license
-                - rejected
-                - invalid_expiration_date
-                - internal_error
-                description: "The result of the operation for this user.\n\nPossible values:\n- `added` – The user was added to the specified Organization and User Groups with the requested role.\n- `invite_without_email` – The user was invited to the specified Organization and User Groups without sending email.\n- `invite_with_email` – The user was invited to the specified Organization and User Groups with the requested role.\n An invitation email was sent to the user.\n- `no_change` – The user is already satisfied the request. No changes were applied.\n- `no_more_license` – The Organization does not have enough licenses to add or invite this user.\n- `rejected` – The request was rejected. This typically happens when attempting to downgrade an existing role.\n- `invalid_expiration_date` – The supplied `expiration_date` is at or before the current time\n (or is not a valid UTC ISO 8601 timestamp). The user was NOT\n added or invited; no email was sent and no seat was consumed.\n- `internal_error` – An internal server error occurred after the request was accepted."
-            required:
-            - email
-            - result
-          description: Results for each target user.
-      required:
-      - results
     OrgMemberListResponse:
       type: object
       properties:
@@ -854,104 +952,6 @@ components:
           description: Total number of users for the current list.
       required:
       - users
-      - next
-      - total
-    OrgInviteListResponse:
-      type: object
-      properties:
-        invites:
-          type: array
-          items:
-            type: object
-            properties:
-              email:
-                examples:
-                - user@example.com
-                type: string
-                description: Email address of the invited user.
-              name:
-                examples:
-                - Jordan Lee
-                - null
-                oneOf:
-                - type: string
-                - type: 'null'
-                description: Display name provided for the invite. This is `null` if no name is provided.
-              role:
-                examples:
-                - org_admin
-                - null
-                oneOf:
-                - $ref: '#/components/schemas/RTOrgRole'
-                - type: 'null'
-                description: Organization-level role that the user will have if the invite is accepted.
-              effective_role:
-                type: string
-                enum:
-                - org_owner
-                - org_admin
-                - space_admin
-                - hub_admin
-                - hub_member
-                description: "Effective role which is the highest role that the user will have\n in the Organization by accepting this invite.\n `hub_member` is a typical end user who joins one or more User Groups\n and does not have any level of administrative privileges anywhere.\n\nPossible values:\n- `org_owner` – Organization Owner.\n- `org_admin` – Organization Administrator.\n- `space_admin` – Space Administrator.\n- `hub_admin` – User Group Administrator.\n- `hub_member` – User Group Member."
-                examples:
-                - hub_member
-              date_invited:
-                examples:
-                - '2024-10-24T04:18:12.345Z'
-                type: string
-                description: The date and time when the invite was last updated or sent in `YYYY-MM-DDTHH:mm:ss.sssZ` format.
-              hubs:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    hub_id:
-                      examples:
-                      - adahbAHKD87
-                      type: string
-                      description: User Group ID.
-                    role:
-                      type: string
-                      enum:
-                      - hub_admin
-                      - hub_member
-                      description: Role that the user will have in the User Group.
-                      examples:
-                      - hub_member
-                  required:
-                  - hub_id
-                  - role
-                description: User Groups and corresponding roles that the user will have if the invite is accepted.
-              expiration_date:
-                examples:
-                - '2024-10-24T04:18:12.345Z'
-                - null
-                oneOf:
-                - type: string
-                - type: 'null'
-                description: "UTC ISO 8601 timestamp for when the accepted membership will\n expire, or `null` when no end date is stamped on the invite.\n Mirrors `OrgMemberResponse.expiration_date` so the frontend can\n treat invite rows and member rows identically."
-            required:
-            - email
-            - name
-            - role
-            - effective_role
-            - date_invited
-            - hubs
-            - expiration_date
-          description: List of outstanding invites for the Organization or User Group.
-        next:
-          examples:
-          - true
-          type: boolean
-          description: Whether there are more invites to list.
-        total:
-          examples:
-          - 105
-          type: number
-          description: Total number of invites for the current list.
-      required:
-      - invites
       - next
       - total
   securitySchemes:

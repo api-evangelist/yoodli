@@ -119,6 +119,16 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    UpdateEnterpriseOrgResponse:
+      type: object
+      properties:
+        success:
+          examples:
+          - true
+          type: boolean
+          description: Whether the operation completed successfully.
+      required:
+      - success
     UpdateEnterpriseOrgRequest:
       type: object
       properties:
@@ -257,16 +267,6 @@ components:
           description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
       required:
       - error
-    UpdateEnterpriseOrgResponse:
-      type: object
-      properties:
-        success:
-          examples:
-          - true
-          type: boolean
-          description: Whether the operation completed successfully.
-      required:
-      - success
   securitySchemes:
     BearerAuth:
       type: http
