@@ -28,7 +28,6 @@ tags:
 - Human Resources
 - Enterprise Software
 - Software-as-a-Service
-- Identity Management
 tags_raw:
 - Artificial Intelligence
 - Communication
@@ -39,7 +38,6 @@ tags_raw:
 - Human Resources
 - Enterprise Software
 - SaaS
-- Identity Management
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -201,3 +199,5 @@ x-coverage:
     - url: https://trust.yoodli.ai/
       status: 200
   checked: '2026-09-04'
+x-tags-removed:
+- Identity Management
