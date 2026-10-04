@@ -72,6 +72,22 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    RTFeedbackExportSection:
+      type: string
+      enum:
+      - goals
+      - coaching_feedback
+      - user_comments
+      - transcript
+      description: 'Possible values:
+
+        - `goals` – Goal/rubric scores and their feedback.
+
+        - `coaching_feedback` – Coaching feedback remarks.
+
+        - `user_comments` – Reviewer/user comments.
+
+        - `transcript` – Full transcript.'
     FeedbackJsonResponse:
       type: object
       properties:
@@ -373,22 +389,6 @@ components:
           description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
       required:
       - error
-    RTFeedbackExportSection:
-      type: string
-      enum:
-      - goals
-      - coaching_feedback
-      - user_comments
-      - transcript
-      description: 'Possible values:
-
-        - `goals` – Goal/rubric scores and their feedback.
-
-        - `coaching_feedback` – Coaching feedback remarks.
-
-        - `user_comments` – Reviewer/user comments.
-
-        - `transcript` – Full transcript.'
   securitySchemes:
     BearerAuth:
       type: http
