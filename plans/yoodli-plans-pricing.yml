@@ -44,3 +44,36 @@ api_access:
     or a Multi Org Administrator. Yoodli publishes no separate API price, no metered API pricing and no per-call
     rate on the pricing page.
 annual_discount: Up to 40% off individual plans when billed annually
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - free
+  - negotiated
+  - subscription
+  units: []
+  plans:
+  - name: Starter
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods: []
+  - name: Pro
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Advanced
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Team & Enterprise
+    access: other
+    model: negotiated
+    model_how: derived
+    units: []
+    periods: []
