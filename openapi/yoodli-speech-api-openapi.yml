@@ -72,22 +72,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    RTFeedbackExportSection:
-      type: string
-      enum:
-      - goals
-      - coaching_feedback
-      - user_comments
-      - transcript
-      description: 'Possible values:
-
-        - `goals` – Goal/rubric scores and their feedback.
-
-        - `coaching_feedback` – Coaching feedback remarks.
-
-        - `user_comments` – Reviewer/user comments.
-
-        - `transcript` – Full transcript.'
     FeedbackJsonResponse:
       type: object
       properties:
@@ -378,6 +362,22 @@ components:
       - speakers
       - coaching_feedback_hidden
       - coaching_feedback_override_message
+    RTFeedbackExportSection:
+      type: string
+      enum:
+      - goals
+      - coaching_feedback
+      - user_comments
+      - transcript
+      description: 'Possible values:
+
+        - `goals` – Goal/rubric scores and their feedback.
+
+        - `coaching_feedback` – Coaching feedback remarks.
+
+        - `user_comments` – Reviewer/user comments.
+
+        - `transcript` – Full transcript.'
     ErrorResponse:
       type: object
       properties:

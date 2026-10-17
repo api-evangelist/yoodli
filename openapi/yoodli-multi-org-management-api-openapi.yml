@@ -129,14 +129,17 @@ components:
           description: Whether the operation completed successfully.
       required:
       - success
-    UpdateEnterpriseOrgRequest:
+    ErrorResponse:
       type: object
       properties:
-        seats_allocated:
-          examples:
-          - 50
-          type: number
-          description: "New number of seats to allocate to the Organization from the Multi Org seat pool.\n Must be a non-negative integer and cannot be less than the current seat usage."
+        error:
+          type: string
+          description: Error message. This is for developers, and not for end users or translated.
+        code:
+          type: string
+          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
+      required:
+      - error
     GetEnterpriseResponse:
       type: object
       properties:
@@ -256,17 +259,14 @@ components:
       - admins
       - member_orgs
       - home_org_id
-    ErrorResponse:
+    UpdateEnterpriseOrgRequest:
       type: object
       properties:
-        error:
-          type: string
-          description: Error message. This is for developers, and not for end users or translated.
-        code:
-          type: string
-          description: "Error code.\n Some API provide this field to identify a known mode of failure.\n The user is Frontend is recommended to translate this error code into a user friendly error message."
-      required:
-      - error
+        seats_allocated:
+          examples:
+          - 50
+          type: number
+          description: "New number of seats to allocate to the Organization from the Multi Org seat pool.\n Must be a non-negative integer and cannot be less than the current seat usage."
   securitySchemes:
     BearerAuth:
       type: http
